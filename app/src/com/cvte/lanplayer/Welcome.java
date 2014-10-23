@@ -13,7 +13,7 @@ public class Welcome extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.welcome);
+		setContentView(R.layout.activity_welcome);
 		
 		Timer mTimer = new Timer();
 		//хннЯ

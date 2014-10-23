@@ -1,13 +1,17 @@
 package com.cvte.lanplayer.view;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -22,10 +26,11 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.adapter.IpListAdapter;
+import com.cvte.lanplayer.service.RecvLanDataService;
+import com.cvte.lanplayer.service.SendLanDataService;
 
 public class ScanLanDeviceFragment extends Fragment {
 
@@ -45,12 +50,22 @@ public class ScanLanDeviceFragment extends Fragment {
 
 	private Activity activity;
 
+	private boolean start = true;
+	private String address;
+	public static final int DEFAULT_PORT = 9598;
+	private static final int MAX_DATA_PACKET_LENGTH = 40;
+	private byte[] buffer = new byte[MAX_DATA_PACKET_LENGTH];
+
 	// 控件
 	// private TextView tv_ip;
 	private Button btn_scan;
+	private Button btn_scan_stop;
 	private ListView lv_iplist;
 
 	private IpListAdapter mIpList_adapter;
+	private final int STARE_SCAN = 1;
+
+	private MyReceiver receiver;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -73,13 +88,41 @@ public class ScanLanDeviceFragment extends Fragment {
 
 		// tv_ip = (TextView) view.findViewById(R.id.tv_ip);
 		btn_scan = (Button) view.findViewById(R.id.btn_scan);
+		btn_scan_stop = (Button) view.findViewById(R.id.btn_scan_stop);
+
 		lv_iplist = (ListView) view.findViewById(R.id.lv_iplist);
 
 		btn_scan.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				ScanLanDevice();
+				// ScanLanDevice();
+
+				// 关闭接收的服务
+				activity.stopService(new Intent(activity,
+						RecvLanDataService.class));
+
+				// 启动扫描，开始服务
+				activity.startService(new Intent(activity,
+						SendLanDataService.class));
+
+				Intent intent = new Intent();
+				intent.putExtra("int", STARE_SCAN);
+
+				intent.setAction("android.intent.action.recv_contrl");// action与接收器相同
+				activity.sendBroadcast(intent);
+
+			}
+		});
+
+		btn_scan_stop.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				activity.stopService(new Intent(activity,
+						SendLanDataService.class));
+
+				activity.startService(new Intent(activity,
+						RecvLanDataService.class));
 			}
 		});
 
@@ -96,63 +139,13 @@ public class ScanLanDeviceFragment extends Fragment {
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-	}
+		// 注册接收器
+		receiver = new MyReceiver();
 
-	/**
-	 * 多线程扫描局域网里面的设备
-	 */
-	static int i;
+		IntentFilter filter = new IntentFilter();
 
-	private void ScanLanDevice() {
-		mIpList.clear();
-		// 扫描局域网里面的IP段-开了255个线程进行扫描
-		for (i = 1; i < 255;) {
-			new Thread() {
-				@Override
-				public void run() {
-
-					synchronized (this) {
-						String ipAddress = mIpAddressHead + String.valueOf(i);
-						i++;
-
-						try {
-							Socket socket = new Socket(ipAddress, port);
-
-							// 读取通信秘钥数据
-							// 将Socket对应的输入流包装成BufferedReader
-							BufferedReader br = new BufferedReader(
-									new InputStreamReader(
-											socket.getInputStream()));
-							// 进行普通IO操作
-							String line = br.readLine();
-							if (line.equals(KEY)) { // 判断是否符合通信秘钥
-								if (!ipAddress.equals(mLocalIp)) { // 判断避免本机IP
-									for (int j = 0; j < mIpList.size(); j++) {
-										// 如果本机已经扫描过该IP，则不用再加入
-										if (mIpList.get(j).equals(ipAddress)) {
-											socket.close();
-											return;
-										}
-									}
-									mIpList.add(ipAddress);
-									// 不能在线程里面更新UI组件
-									// tv_ip.setText(tv_ip.getText() +
-									// "  172.18.54.68");
-									Log.d(TAG, ipAddress);
-
-									handler.sendEmptyMessage(123);
-								}
-
-							}
-
-							socket.close();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}
-			}.start();
-		}
+		filter.addAction("android.intent.action.recvip");
+		activity.registerReceiver(receiver, filter);
 	}
 
 	Handler handler = new Handler() {
@@ -197,5 +190,76 @@ public class ScanLanDeviceFragment extends Fragment {
 		return ((ipAddress & 0xff) + "." + (ipAddress >> 8 & 0xff) + "."
 				+ (ipAddress >> 16 & 0xff) + ".");
 
+	}
+
+	private String getLocalIPAddress() {
+		try {
+			for (Enumeration<NetworkInterface> en = NetworkInterface
+					.getNetworkInterfaces(); en.hasMoreElements();) {
+				NetworkInterface intf = en.nextElement();
+				for (Enumeration<InetAddress> enumIpAddr = intf
+						.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+					InetAddress inetAddress = enumIpAddr.nextElement();
+					if (!inetAddress.isLoopbackAddress()) {
+						return inetAddress.getHostAddress().toString();
+					}
+				}
+			}
+		} catch (SocketException ex) {
+			Log.e(TAG, ex.toString());
+		}
+		return null;
+	}
+
+	public class MyReceiver extends BroadcastReceiver {
+
+		// 自定义一个广播接收器
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			// TODO Auto-generated method stub
+
+			System.out.println("OnReceiver");
+
+			Bundle bundle = intent.getExtras();
+
+			String str = bundle.getString("str");
+
+			// progressBar.setProgress(a);
+
+			// label.setText(String.valueOf(str));
+			for (int i = 0; i < mIpList.size(); i++) {
+				if (str.equals(mIpList.get(i))) {
+					// 如果已经有了，就不添加
+					return;
+				}
+			}
+
+			mIpList.add(str);
+			// 更新数据
+			mIpList_adapter.notifyDataSetChanged();
+
+			// 处理接收到的内容
+
+		}
+
+		public MyReceiver() {
+
+			System.out.println("MyReceiver");
+
+			// 构造函数，做一些初始化工作，本例中无任何作用
+
+		}
+
+	}
+
+	@Override
+	public void onDestroy() {
+		// TODO Auto-generated method stub
+		super.onDestroy();
+
+		// 开始服务
+		activity.stopService(new Intent(activity, SendLanDataService.class));
 	}
 }

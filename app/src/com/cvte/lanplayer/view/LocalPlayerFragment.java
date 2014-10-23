@@ -70,7 +70,7 @@ public class LocalPlayerFragment extends Fragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.music_list, container, false);
+		View view = inflater.inflate(R.layout.fragment_local_music, container, false);
 
 		mListView = (ListView) view.findViewById(R.id.music_list);
 		myView = view;
