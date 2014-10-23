@@ -156,6 +156,12 @@ public class LocalPlayerFragment extends Fragment {
 	private void InitMusicList() {
 
 		File home = new File(MUSIC_PATH);
+		if(home == null){	
+			Log.d(TAG,"内部存储器不在");
+			
+			return;
+		}
+		
 		if (home.listFiles(new MusicFilter()).length > 0) {
 			for (File file : home.listFiles(new MusicFilter())) {
 				myMusicList.add(file.getName());

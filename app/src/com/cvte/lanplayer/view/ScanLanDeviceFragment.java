@@ -3,8 +3,6 @@ package com.cvte.lanplayer.view;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,24 +21,37 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cvte.lanplayer.R;
+import com.cvte.lanplayer.adapter.IpListAdapter;
 
 public class ScanLanDeviceFragment extends Fragment {
 
-	private List<String> IpList = new ArrayList<String>();
-	private final int port = 9598; // 默认端口号
-	private String mIpAddressHead = null;
 	private final String TAG = "ScanLanDevice";
+
+	// 通信秘钥
 	private final String KEY = "welcome to cvte";
+
+	// 本机IP
 	private String mLocalIp = null;
-	private TextView tv_ip;
-	private Button btn_scan;
-	
+	// 本机IP头，如：192.168.1
+	private String mIpAddressHead = null;
+	// 扫描出来的IP列表
+	private List<String> mIpList = new ArrayList<String>();
+	// 默认端口号
+	private final int port = 9598;
+
 	private Activity activity;
-	
-	
+
+	// 控件
+	// private TextView tv_ip;
+	private Button btn_scan;
+	private ListView lv_iplist;
+
+	private IpListAdapter mIpList_adapter;
+
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -57,10 +68,12 @@ public class ScanLanDeviceFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater,
 			@Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.fragment_scan_landevice, container,false);
+		View view = inflater.inflate(R.layout.fragment_scan_landevice,
+				container, false);
 
-		tv_ip = (TextView) view.findViewById(R.id.tv_ip);
+		// tv_ip = (TextView) view.findViewById(R.id.tv_ip);
 		btn_scan = (Button) view.findViewById(R.id.btn_scan);
+		lv_iplist = (ListView) view.findViewById(R.id.lv_iplist);
 
 		btn_scan.setOnClickListener(new OnClickListener() {
 
@@ -70,11 +83,12 @@ public class ScanLanDeviceFragment extends Fragment {
 			}
 		});
 
-		
+		mIpList_adapter = new IpListAdapter(mIpList, activity);
+		lv_iplist.setAdapter(mIpList_adapter);
 
 		mLocalIp = getIpAddress();
 		mIpAddressHead = getIpAddressHead();
-		Log.d(TAG,mLocalIp);
+		Log.d(TAG, mLocalIp);
 
 		return view;
 	}
@@ -82,22 +96,21 @@ public class ScanLanDeviceFragment extends Fragment {
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
-
 	}
-	
+
 	/**
 	 * 多线程扫描局域网里面的设备
 	 */
 	static int i;
 
 	private void ScanLanDevice() {
-		IpList.clear();
+		mIpList.clear();
 		// 扫描局域网里面的IP段-开了255个线程进行扫描
 		for (i = 1; i < 255;) {
 			new Thread() {
 				@Override
 				public void run() {
-					
+
 					synchronized (this) {
 						String ipAddress = mIpAddressHead + String.valueOf(i);
 						i++;
@@ -112,16 +125,16 @@ public class ScanLanDeviceFragment extends Fragment {
 											socket.getInputStream()));
 							// 进行普通IO操作
 							String line = br.readLine();
-							if (line.equals(KEY)) {	//判断是否符合通信秘钥
-								if (!ipAddress.equals(mLocalIp)) {	//判断避免本机IP
-									for(int j=0;j<IpList.size();j++){
-										//如果本机已经扫描过该IP，则不用再加入
-										if(IpList.get(j).equals(ipAddress)){
+							if (line.equals(KEY)) { // 判断是否符合通信秘钥
+								if (!ipAddress.equals(mLocalIp)) { // 判断避免本机IP
+									for (int j = 0; j < mIpList.size(); j++) {
+										// 如果本机已经扫描过该IP，则不用再加入
+										if (mIpList.get(j).equals(ipAddress)) {
 											socket.close();
 											return;
 										}
 									}
-									IpList.add(ipAddress);
+									mIpList.add(ipAddress);
 									// 不能在线程里面更新UI组件
 									// tv_ip.setText(tv_ip.getText() +
 									// "  172.18.54.68");
@@ -146,10 +159,9 @@ public class ScanLanDeviceFragment extends Fragment {
 
 		@Override
 		public void handleMessage(Message msg) {
-			for (int i = 0; i < IpList.size(); i++) {
-				Log.d(TAG, IpList.get(i));
-				tv_ip.setText(tv_ip.getText() + IpList.get(i) + "\n");
-			}
+
+			// 更新数据
+			mIpList_adapter.notifyDataSetChanged();
 		}
 	};
 
@@ -157,7 +169,8 @@ public class ScanLanDeviceFragment extends Fragment {
 	 * 获取本机的IP地址
 	 */
 	private String getIpAddress() {
-		WifiManager wifiManager = (WifiManager) activity.getSystemService(activity.WIFI_SERVICE);
+		WifiManager wifiManager = (WifiManager) activity
+				.getSystemService(activity.WIFI_SERVICE);
 
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
@@ -168,12 +181,13 @@ public class ScanLanDeviceFragment extends Fragment {
 				+ (ipAddress >> 16 & 0xff) + "." + (ipAddress >> 24 & 0xff));
 
 	}
-	
+
 	/**
 	 * 获取本机的IP地址的头，如192.168.1.
 	 */
 	private String getIpAddressHead() {
-		WifiManager wifiManager = (WifiManager) activity.getSystemService(activity.WIFI_SERVICE);
+		WifiManager wifiManager = (WifiManager) activity
+				.getSystemService(activity.WIFI_SERVICE);
 
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 

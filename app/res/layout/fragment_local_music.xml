@@ -3,11 +3,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    
+    
     <ListView
         android:id="@+id/lv_songlist"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
         android:layout_alignParentTop="true"
+        android:layout_marginBottom="60dp"
         android:layout_marginTop="10dp" />
 
     <LinearLayout

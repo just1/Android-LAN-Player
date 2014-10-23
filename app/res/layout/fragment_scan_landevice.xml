@@ -1,22 +1,28 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/tv_ip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="" />
-
     <Button
         android:id="@+id/btn_scan"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:textSize="18sp"
+        android:layout_alignParentTop="true"
+        android:text="开始扫描" />
+    
+    
+      <ListView
+        android:id="@+id/lv_iplist"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_ip"
-        android:text="scan" />
+        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/btn_scan"
+        android:layout_marginBottom="10dp"
+         />
     
     
-  
 
-</LinearLayout>
+</RelativeLayout>
