@@ -24,10 +24,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 
 import com.cvte.lanplayer.R;
+import com.cvte.lanplayer.Welcome;
 import com.cvte.lanplayer.adapter.IpListAdapter;
 import com.cvte.lanplayer.service.RecvLanDataService;
 import com.cvte.lanplayer.service.SendLanDataService;
@@ -35,7 +38,6 @@ import com.cvte.lanplayer.service.SendLanDataService;
 public class ScanLanDeviceFragment extends Fragment {
 
 	private final String TAG = "ScanLanDevice";
-
 	// 通信秘钥
 	private final String KEY = "welcome to cvte";
 
@@ -89,9 +91,31 @@ public class ScanLanDeviceFragment extends Fragment {
 		// tv_ip = (TextView) view.findViewById(R.id.tv_ip);
 		btn_scan = (Button) view.findViewById(R.id.btn_scan);
 		btn_scan_stop = (Button) view.findViewById(R.id.btn_scan_stop);
-
 		lv_iplist = (ListView) view.findViewById(R.id.lv_iplist);
 
+		return view;
+	}
+
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+
+		InitListener();
+
+		mIpList_adapter = new IpListAdapter(mIpList, activity);
+		lv_iplist.setAdapter(mIpList_adapter);
+
+		// 注册接收器
+		receiver = new MyReceiver();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction("android.intent.action.recvip");
+		activity.registerReceiver(receiver, filter);
+
+		mLocalIp = getIpAddress();
+		mIpAddressHead = getIpAddressHead();
+		Log.d(TAG, mLocalIp);
+	}
+
+	private void InitListener() {
 		btn_scan.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -126,26 +150,23 @@ public class ScanLanDeviceFragment extends Fragment {
 			}
 		});
 
-		mIpList_adapter = new IpListAdapter(mIpList, activity);
-		lv_iplist.setAdapter(mIpList_adapter);
+		lv_iplist.setOnItemClickListener(new OnItemClickListener() {
 
-		mLocalIp = getIpAddress();
-		mIpAddressHead = getIpAddressHead();
-		Log.d(TAG, mLocalIp);
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
 
-		return view;
-	}
+				//Intent startIntent = new Intent(activity,
+				//		LanDeviceControlActivity.class);
+				Intent startIntent = new Intent(activity,
+						LanDeviceControlActivity.class);
+				
+				startIntent.putExtra("ip", mIpList.get(position));
+				startActivity(startIntent);
 
-	@Override
-	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+			}
+		});
 
-		// 注册接收器
-		receiver = new MyReceiver();
-
-		IntentFilter filter = new IntentFilter();
-
-		filter.addAction("android.intent.action.recvip");
-		activity.registerReceiver(receiver, filter);
 	}
 
 	Handler handler = new Handler() {

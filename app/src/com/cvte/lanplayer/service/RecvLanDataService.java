@@ -40,7 +40,13 @@ public class RecvLanDataService extends Service {
 					e1.printStackTrace();
 				}
 				while (true) {
-
+					//不用连续扫描
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 					try {
 						udpSocket.receive(udpPacket);
 					} catch (Exception e) {

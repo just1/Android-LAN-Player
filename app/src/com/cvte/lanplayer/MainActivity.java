@@ -13,11 +13,12 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.view.Window;
 
 import com.cvte.lanplayer.service.RecvLanDataService;
 import com.cvte.lanplayer.view.LocalPlayerFragment;
 import com.cvte.lanplayer.view.ScanLanDeviceFragment;
-import com.cvte.lanplayer.view.fragment1;
+import com.cvte.lanplayer.view.fragment_test;
 
 public class MainActivity extends FragmentActivity {
 	private final String TAG = "MainActivity";
@@ -42,13 +43,17 @@ public class MainActivity extends FragmentActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// 隐藏Title
+		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		
 		setContentView(R.layout.activity_main);
 
 		vp = (ViewPager) findViewById(R.id.vp);
 		adapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
 
 		fragmentList.add(new LocalPlayerFragment());
-		fragmentList.add(new fragment1());
+		fragmentList.add(new fragment_test());
 		fragmentList.add(new ScanLanDeviceFragment());
 		titleList.add("播放");
 		titleList.add("歌词");
@@ -58,36 +63,6 @@ public class MainActivity extends FragmentActivity {
 
 		// 开始接收信息的服务
 		startService(new Intent(MainActivity.this, RecvLanDataService.class));
-
-		// // 开辟线程等待socket连接
-		// new Thread() {
-		// public void run() {
-		//
-		// ServerSocket ss = null;
-		// try {
-		// ss = new ServerSocket(port);
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// // 采用循环不断接受来自客户端的请求
-		// while (true) {
-		// // 每当接受到客户端Socket的请求，服务器端也对应产生一个Socket
-		// Socket s;
-		// try {
-		// s = ss.accept();
-		// OutputStream os = s.getOutputStream();
-		// os.write(KEY.getBytes("utf-8"));
-		// // 关闭输出流，关闭Socket
-		// os.close();
-		// s.close();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// }
-		// };
-		// }.start();
 
 	}
 
