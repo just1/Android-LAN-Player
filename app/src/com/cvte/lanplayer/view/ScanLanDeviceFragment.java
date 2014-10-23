@@ -30,7 +30,6 @@ import android.widget.Button;
 import android.widget.ListView;
 
 import com.cvte.lanplayer.R;
-import com.cvte.lanplayer.Welcome;
 import com.cvte.lanplayer.adapter.IpListAdapter;
 import com.cvte.lanplayer.service.RecvLanDataService;
 import com.cvte.lanplayer.service.SendLanDataService;
@@ -47,8 +46,6 @@ public class ScanLanDeviceFragment extends Fragment {
 	private String mIpAddressHead = null;
 	// 扫描出来的IP列表
 	private List<String> mIpList = new ArrayList<String>();
-	// 默认端口号
-	private final int port = 9598;
 
 	private Activity activity;
 
@@ -111,7 +108,6 @@ public class ScanLanDeviceFragment extends Fragment {
 		activity.registerReceiver(receiver, filter);
 
 		mLocalIp = getIpAddress();
-		mIpAddressHead = getIpAddressHead();
 		Log.d(TAG, mLocalIp);
 	}
 
@@ -169,16 +165,6 @@ public class ScanLanDeviceFragment extends Fragment {
 
 	}
 
-	Handler handler = new Handler() {
-
-		@Override
-		public void handleMessage(Message msg) {
-
-			// 更新数据
-			mIpList_adapter.notifyDataSetChanged();
-		}
-	};
-
 	/**
 	 * 获取本机的IP地址
 	 */
@@ -196,23 +182,11 @@ public class ScanLanDeviceFragment extends Fragment {
 
 	}
 
+
 	/**
-	 * 获取本机的IP地址的头，如192.168.1.
+	 * 获取本地IP地址(2)
+	 * @return
 	 */
-	private String getIpAddressHead() {
-		WifiManager wifiManager = (WifiManager) activity
-				.getSystemService(activity.WIFI_SERVICE);
-
-		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-
-		int ipAddress = wifiInfo.getIpAddress();
-		// Log.d("TAG","IP:"+ String.valueOf(ipAddress));
-
-		return ((ipAddress & 0xff) + "." + (ipAddress >> 8 & 0xff) + "."
-				+ (ipAddress >> 16 & 0xff) + ".");
-
-	}
-
 	private String getLocalIPAddress() {
 		try {
 			for (Enumeration<NetworkInterface> en = NetworkInterface
@@ -235,24 +209,15 @@ public class ScanLanDeviceFragment extends Fragment {
 	public class MyReceiver extends BroadcastReceiver {
 
 		// 自定义一个广播接收器
-
 		@Override
 		public void onReceive(Context context, Intent intent) {
 
-			// TODO Auto-generated method stub
-
-			System.out.println("OnReceiver");
-
 			Bundle bundle = intent.getExtras();
-
 			String str = bundle.getString("str");
-
-			// progressBar.setProgress(a);
-
-			// label.setText(String.valueOf(str));
+			
+			// 如果已经有了，就不添加
 			for (int i = 0; i < mIpList.size(); i++) {
 				if (str.equals(mIpList.get(i))) {
-					// 如果已经有了，就不添加
 					return;
 				}
 			}
@@ -260,17 +225,7 @@ public class ScanLanDeviceFragment extends Fragment {
 			mIpList.add(str);
 			// 更新数据
 			mIpList_adapter.notifyDataSetChanged();
-
 			// 处理接收到的内容
-
-		}
-
-		public MyReceiver() {
-
-			System.out.println("MyReceiver");
-
-			// 构造函数，做一些初始化工作，本例中无任何作用
-
 		}
 
 	}
@@ -280,7 +235,10 @@ public class ScanLanDeviceFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onDestroy();
 
-		// 开始服务
+		// 停止服务
 		activity.stopService(new Intent(activity, SendLanDataService.class));
+	
+		// 解除注册接收器
+        activity.unregisterReceiver(receiver);
 	}
 }

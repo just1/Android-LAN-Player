@@ -6,6 +6,8 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.SocketException;
 
+import com.cvte.lanplayer.GlobalData;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -34,7 +36,7 @@ public class RecvLanDataService extends Service {
 			public void run() {
 				byte[] data = new byte[256];
 				try {
-					udpSocket = new DatagramSocket(43708);
+					udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
 					udpPacket = new DatagramPacket(data, data.length);
 				} catch (SocketException e1) {
 					e1.printStackTrace();
@@ -66,7 +68,7 @@ public class RecvLanDataService extends Service {
 
 							SendMessage("建立socket通信：" + ip + "\n");
 
-							socket = new Socket(ip, 8080);
+							socket = new Socket(ip, GlobalData.Socket_PORT);
 
 						} catch (IOException e) {
 							e.printStackTrace();

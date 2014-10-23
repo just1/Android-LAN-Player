@@ -38,8 +38,7 @@ public class LanDeviceControlActivity extends Activity {
 	private void InitView() {
 		
 		tv_target_ip = (TextView) findViewById(R.id.tv_target_ip);
-		
-		tv_target_ip.setText(targetIp);
+		tv_target_ip.setText("Ä¿±êIP£º"+targetIp);
 	}
 	
 	private void InitData(){

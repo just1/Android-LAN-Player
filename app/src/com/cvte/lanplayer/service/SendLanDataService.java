@@ -18,10 +18,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.util.Log;
+
+import com.cvte.lanplayer.GlobalData;
 
 public class SendLanDataService extends Service {
 
@@ -31,7 +31,7 @@ public class SendLanDataService extends Service {
 	private static String LOG_TAG = "SendLanDataService";
 	private boolean start = true;
 	private String address;
-	public static final int DEFAULT_PORT = 43708;
+	//public static final int DEFAULT_PORT = 43708;
 	private static final int MAX_DATA_PACKET_LENGTH = 40;
 	private byte[] buffer = new byte[MAX_DATA_PACKET_LENGTH];
 
@@ -55,9 +55,7 @@ public class SendLanDataService extends Service {
 
 		// 注册接收器
 		receiver = new MyReceiver();
-
 		IntentFilter filter = new IntentFilter();
-
 		filter.addAction("android.intent.action.recv_contrl");
 		registerReceiver(receiver, filter);
 
@@ -102,13 +100,13 @@ public class SendLanDataService extends Service {
 			DatagramPacket dataPacket = null;
 
 			try {
-				udpSocket = new DatagramSocket(DEFAULT_PORT);
+				udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
 
 				dataPacket = new DatagramPacket(buffer, MAX_DATA_PACKET_LENGTH);
 				byte[] data = dataString.getBytes();
 				dataPacket.setData(data);
 				dataPacket.setLength(data.length);
-				dataPacket.setPort(DEFAULT_PORT);
+				dataPacket.setPort(GlobalData.UDP_PORT);
 
 				InetAddress broadcastAddr;
 
@@ -139,12 +137,10 @@ public class SendLanDataService extends Service {
 				
 				BufferedReader in = null;
 				try {
-					Log.i("TcpReceive", "ServerSocket +++++++");
-					ss = new ServerSocket(8080);
+					ss = new ServerSocket(GlobalData.Socket_PORT);
 
 					socket = ss.accept();
 
-					Log.i("TcpReceive", "connect +++++++");
 					if (socket != null) {
 
 						in = new BufferedReader(new InputStreamReader(
@@ -160,7 +156,7 @@ public class SendLanDataService extends Service {
 
 						final String ipString = sb.toString().trim();// "192.168.0.104:8731";
 
-						SendMessage("发现IP：" + ipString + "\n");
+						SendMessage(ipString);
 
 					}
 				} catch (IOException e) {
@@ -189,9 +185,6 @@ public class SendLanDataService extends Service {
 		mBroadCastUdp = new BroadCastUdp(getLocalIPAddress().toString());
 		mBroadCastUdp.start();
 		
-		//开启后定时关闭
-		//mStopServiceHandler.sendEmptyMessageDelayed(123, 5000);
-
 	}
 
 	public class MyReceiver extends BroadcastReceiver {
@@ -254,7 +247,10 @@ public class SendLanDataService extends Service {
 			}
 		}
 		
-	};
+		 
+		// 解除注册接收器
+        this.unregisterReceiver(receiver);
+	}
 
 
 }
