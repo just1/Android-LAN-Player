@@ -33,24 +33,6 @@ public class MainActivity extends FragmentActivity {
 
 	private LocalPlayerFragment mLocalPlayerFragment;
 
-	// // 播放对象
-	// private MediaPlayer myMediaPlayer;
-	// // 播放列表
-	// private List<String> myMusicList = new ArrayList<String>();
-	// // 当前播放歌曲的索引
-	// private int currentListItem = 0;
-	// // 音乐的路径
-	// private static final String MUSIC_PATH = new String("/sdcard/");
-	//
-	// // 控件
-	// private ListView lv_songlist;
-	// private MusicListAdapter music_lv_adapter;
-	// private Button btn_play;
-	// private Button btn_stop;
-	// private Button btn_pause;
-	// private Button btn_next;
-	// private Button btn_last;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

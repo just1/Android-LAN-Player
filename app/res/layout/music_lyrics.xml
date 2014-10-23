@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@drawable/wlh">
+    <RelativeLayout android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true">
+        <TextView android:id="@+id/music_txt_songName"
+            android:layout_width="match_parent"
+            android:gravity="center_vertical"
+            android:layout_height="40dp"
+            android:textSize="18sp"
+            android:textColor="@color/white_bg"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:text="欢迎来到搜易音乐"/>
+    </RelativeLayout>
+    <RelativeLayout 
+	    android:id="@+id/miniplayLayout" 
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentBottom="true"
+	    android:background="@drawable/playcontrol_bg"
+	    android:gravity="center">		
+	    
+		    <!-- 播放模式 -->
+	        <ImageButton 
+	        android:id="@+id/music_btn_playMode" 
+	        android:layout_width="65dp" 
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentLeft="true"
+	        android:layout_centerVertical="true"
+	        android:layout_weight="1"
+	        android:src="@drawable/straight"
+	        android:background="@drawable/selector_music_btn">
+	        </ImageButton>
+	        
+	        <!-- 菜单按钮 -->
+	        <ImageButton 
+	        android:id="@+id/music_btn_Menu" 
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content"
+	        android:layout_alignParentRight="true"
+	        android:layout_centerVertical="true"
+	        android:layout_weight="1"
+	        android:src="@drawable/menu"
+	        android:background="@drawable/selector_music_btn">
+	        </ImageButton>	
+	        	
+	        <!-- 播放暂停按钮 -->
+	        <ImageButton 
+	        android:id="@+id/music_btn_playAndPause" 
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content"
+	      	android:layout_centerInParent="true"
+	        android:layout_weight="1"
+	        android:src="@drawable/player_play"
+	        android:background="@drawable/selector_music_btn">
+	        </ImageButton>
+	        <!-- 上一首歌曲按钮 -->
+	        <ImageButton 
+	        android:id="@+id/music_btn_playPre" 
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content"
+	        android:layout_toLeftOf="@id/music_btn_playAndPause"
+	        android:layout_centerVertical="true"
+	        android:src="@drawable/player_pre"
+	        android:background="@drawable/selector_music_btn">
+	        </ImageButton>
+	        
+	        <!-- 下一首歌曲按钮 -->
+	        <ImageButton 
+	        android:id="@+id/music_btn_playNext" 
+	        android:layout_width="wrap_content" 
+	        android:layout_height="wrap_content"
+	        android:layout_toRightOf="@id/music_btn_playAndPause"
+	        android:layout_centerVertical="true"
+	    	android:layout_weight="1"
+	        android:src="@drawable/player_next"
+	        android:background="@drawable/selector_music_btn">
+	        </ImageButton>		
+	    </RelativeLayout>
+				    
+		
+	    <RelativeLayout 
+		android:id="@+id/progressLayout" 
+		android:layout_above="@id/miniplayLayout"  
+	    android:layout_width="fill_parent" 
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/progresslayout_bg"
+	    android:gravity="center_vertical">
+	        
+	        <!-- 当前歌曲播放到的时间 -->
+	    	<TextView 
+		    android:text="00:00" 
+		    android:id="@+id/music_txt_currTime" 
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:layout_marginLeft="10dp"
+	    	android:layout_marginRight="10dp"
+	    	android:textColor="@android:color/white"
+	    	android:textStyle="bold"
+		    android:layout_alignParentLeft="true">
+		    </TextView>
+		    
+		    <!-- 当前歌曲播放总时间 -->
+		    <TextView 
+		    android:text="00:00" 
+		    android:id="@+id/music_txt_totalTime" 
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+			android:layout_marginLeft="10dp"
+			android:layout_marginRight="10dp"
+			android:textColor="@android:color/white"
+			android:textStyle="bold"
+		    android:layout_alignParentRight="true">
+		    </TextView>
+				
+			<!-- 音乐进度条 -->
+	   		<SeekBar 
+	   		android:id="@+id/music_seekBar"
+	   		android:layout_width="fill_parent" 
+	   		android:layout_height="wrap_content"	
+	   		android:layout_toRightOf="@id/music_txt_currTime"
+	   		android:layout_toLeftOf="@id/music_txt_totalTime"
+	   		android:paddingLeft="5dp"
+	   		android:paddingRight="5dp"
+			android:max="100" 
+			android:progressDrawable="@drawable/seekbar_style"  
+	   		android:thumb="@drawable/seekbar_thumb"
+	   		android:background="@drawable/progress_buffering" >
+	   		</SeekBar>
+
+		</RelativeLayout>
+
+</RelativeLayout>
