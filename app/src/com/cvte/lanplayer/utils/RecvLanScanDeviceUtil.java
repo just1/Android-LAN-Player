@@ -10,6 +10,7 @@ import com.cvte.lanplayer.GlobalData;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 
 
 /**
@@ -52,7 +53,11 @@ public class RecvLanScanDeviceUtil {
 	private void SendMessage(String str) {
 		Intent intent = new Intent();
 
-		intent.putExtra("str", str);
+		
+		Bundle data = new Bundle();
+		data.putString(GlobalData.RECV_SCAN, str);
+		
+		intent.putExtras(data);
 		intent.setAction(GlobalData.IS_SCANED_ACTION);// action与接收器相同
 
 		mService.sendBroadcast(intent);

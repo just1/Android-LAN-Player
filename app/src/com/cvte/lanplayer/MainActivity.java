@@ -18,13 +18,11 @@ import android.view.Window;
 import com.cvte.lanplayer.service.RecvLanDataService;
 import com.cvte.lanplayer.view.LocalPlayerFragment;
 import com.cvte.lanplayer.view.ScanLanDeviceFragment;
-import com.cvte.lanplayer.view.fragment_test;
+import com.cvte.lanplayer.view.LanMsgTestFragment;
 
 public class MainActivity extends FragmentActivity {
 	private final String TAG = "MainActivity";
 
-	private final int port = 9598; // 默认端口号
-	private final String KEY = "welcome to cvte";
 
 	private MyFragmentPagerAdapter adapter;
 	private ViewPager vp;
@@ -33,7 +31,6 @@ public class MainActivity extends FragmentActivity {
 	// fragment数组
 	List<Fragment> fragmentList = new ArrayList<Fragment>();
 
-	private LocalPlayerFragment mLocalPlayerFragment;
 
 	// udp等待连接
 	Socket socket = null;
@@ -53,11 +50,12 @@ public class MainActivity extends FragmentActivity {
 		adapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
 
 		fragmentList.add(new LocalPlayerFragment());
-		fragmentList.add(new fragment_test());
 		fragmentList.add(new ScanLanDeviceFragment());
+		fragmentList.add(new LanMsgTestFragment());
+		
 		titleList.add("播放");
-		titleList.add("歌词");
 		titleList.add("扫描");
+		titleList.add("测试消息通信");
 
 		vp.setAdapter(adapter);
 

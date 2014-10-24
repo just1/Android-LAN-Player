@@ -7,13 +7,11 @@ public class GlobalData {
 	 */
 	public static final int UDP_PORT = 43718;
 
-	
-	
 	/*
 	 * Socket扫描用的的端口
 	 */
 	public static final int SOCKET_PORT = 38381;
-	
+
 	/*
 	 * Socket通信的端口
 	 */
@@ -37,19 +35,46 @@ public class GlobalData {
 	/*
 	 * 返回扫描结果的接收器
 	 */
-	public static final String GET_SCAN_DATA_ACTION = 
-			"android.intent.action.get_scan_data";
+	public static final String GET_SCAN_DATA_ACTION = "android.intent.action.get_scan_data";
 
 	/*
 	 * 局域网其他设备扫描到本机时候的接收器
 	 */
-	public static final String IS_SCANED_ACTION = 
-			"android.intent.action.is_scaned";
+	public static final String IS_SCANED_ACTION = "android.intent.action.is_scaned";
 
 	/*
 	 * 局域网内收到其他设备消息的接收器
 	 */
-	public static final String RECV_LAN_SOCKET_MSG_ACTION = 
-			"android.intent.action.recv_lan_socket_msg";
+	public static final String RECV_LAN_SOCKET_MSG_ACTION = "android.intent.action.recv_lan_socket_msg";
+
+	/*
+	 * 负责局域网接收的service向各个组件发送广播的接收器
+	 */
+	public static final String RECV_SOCKET_FROM_SERVICE_ACTION = "android.intent.action.recv_lan_socket_from_service";
+
+	/*
+	 * 收到简单的文本信息
+	 */
+	public static final String RECV_SCAN = "recv_scan";
+
+	/*
+	 * 收到简单的文本信息
+	 */
+	public static final int RECV_MSG = 1;
+
+	/*
+	 * 请求获取音乐列表
+	 */
+	public static final int REQUSET_MUSIC_LIST = 2;
+	
+	/*
+	 * 请求获取接收器的指令
+	 */
+	public static final String GET_BUNDLE_COMMANT = "commant";
+
+	/*
+	 * 请求获取Bundle里面的数据
+	 */
+	public static final String GET_BUNDLE_DATA = "getdata";
 
 }

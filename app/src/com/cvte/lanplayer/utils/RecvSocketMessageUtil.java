@@ -12,8 +12,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
@@ -63,9 +65,14 @@ public class RecvSocketMessageUtil {
 	 */
 	private void SendMessage(String str) {
 		Intent intent = new Intent();
-		intent.putExtra("str", str);
-		intent.setAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);// action与接收器相同
 
+		Bundle data = new Bundle();
+		data.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.RECV_MSG);
+		data.putString(GlobalData.GET_BUNDLE_DATA, str);
+		
+		intent.putExtras(data);
+		intent.setAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);// action与接收器相同
+		
 		mContext.sendBroadcast(intent);
 	}
 
@@ -133,4 +140,5 @@ public class RecvSocketMessageUtil {
 			}
 		}
 	}
+	
 }
