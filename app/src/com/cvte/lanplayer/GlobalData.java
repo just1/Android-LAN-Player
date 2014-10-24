@@ -18,6 +18,17 @@ public class GlobalData {
 	public static final String CTRL_SCAN_ACTION = "android.intent.action.ctrl_scan";
 
 	/*
+	 * 启动扫描
+	 */
+	public static final int STARE_SCAN = 1;
+	
+	/*
+	 * 停止扫描
+	 */
+	public static final int STOP_SCAN = 2;
+	
+	
+	/*
 	 * 返回扫描结果的接收器
 	 */
 	public static final String GET_SCAN_DATA_ACTION = "android.intent.action.get_scan_data";

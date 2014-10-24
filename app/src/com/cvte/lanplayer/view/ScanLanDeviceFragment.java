@@ -45,13 +45,7 @@ public class ScanLanDeviceFragment extends Fragment {
 
 	// 扫描出来的IP列表
 	private List<String> mIpList = new ArrayList<String>();
-
 	private Activity activity;
-
-	private boolean start = true;
-	private String address;
-	private static final int MAX_DATA_PACKET_LENGTH = 40;
-	private byte[] buffer = new byte[MAX_DATA_PACKET_LENGTH];
 
 	// 控件
 	private TextView tv_local_ip;
@@ -62,7 +56,7 @@ public class ScanLanDeviceFragment extends Fragment {
 	private IpListAdapter mIpList_adapter;
 	private final int STARE_SCAN = 1;
 
-	private MyReceiver receiver;
+	private ScanDataReceiver mScanDataReceiver;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -107,10 +101,10 @@ public class ScanLanDeviceFragment extends Fragment {
 		lv_iplist.setAdapter(mIpList_adapter);
 
 		// 注册接收器
-		receiver = new MyReceiver();
+		mScanDataReceiver = new ScanDataReceiver();
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(GlobalData.GET_SCAN_DATA_ACTION);
-		activity.registerReceiver(receiver, filter);
+		activity.registerReceiver(mScanDataReceiver, filter);
 
 		mLocalIp = getIpAddress();
 		tv_local_ip.setText("本机IP："+String.valueOf(mLocalIp));
@@ -158,8 +152,6 @@ public class ScanLanDeviceFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				// Intent startIntent = new Intent(activity,
-				// LanDeviceControlActivity.class);
 				Intent startIntent = new Intent(activity,
 						LanDeviceControlActivity.class);
 
@@ -188,31 +180,9 @@ public class ScanLanDeviceFragment extends Fragment {
 
 	}
 
-	/**
-	 * 获取本地IP地址(2)
-	 * 
-	 * @return
-	 */
-	private String getLocalIPAddress() {
-		try {
-			for (Enumeration<NetworkInterface> en = NetworkInterface
-					.getNetworkInterfaces(); en.hasMoreElements();) {
-				NetworkInterface intf = en.nextElement();
-				for (Enumeration<InetAddress> enumIpAddr = intf
-						.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-					InetAddress inetAddress = enumIpAddr.nextElement();
-					if (!inetAddress.isLoopbackAddress()) {
-						return inetAddress.getHostAddress().toString();
-					}
-				}
-			}
-		} catch (SocketException ex) {
-			Log.e(TAG, ex.toString());
-		}
-		return null;
-	}
 
-	public class MyReceiver extends BroadcastReceiver {
+	//获取扫描出来的IP地址的接收器
+	public class ScanDataReceiver extends BroadcastReceiver {
 
 		// 自定义一个广播接收器
 		@Override
@@ -245,6 +215,6 @@ public class ScanLanDeviceFragment extends Fragment {
 		activity.stopService(new Intent(activity, SendLanDataService.class));
 
 		// 解除注册接收器
-		activity.unregisterReceiver(receiver);
+		activity.unregisterReceiver(mScanDataReceiver);
 	}
 }
