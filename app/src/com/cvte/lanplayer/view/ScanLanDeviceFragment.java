@@ -15,8 +15,6 @@ import android.content.IntentFilter;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -28,7 +26,9 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
+import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.adapter.IpListAdapter;
 import com.cvte.lanplayer.service.RecvLanDataService;
@@ -42,8 +42,7 @@ public class ScanLanDeviceFragment extends Fragment {
 
 	// 本机IP
 	private String mLocalIp = null;
-	// 本机IP头，如：192.168.1
-	private String mIpAddressHead = null;
+
 	// 扫描出来的IP列表
 	private List<String> mIpList = new ArrayList<String>();
 
@@ -51,12 +50,11 @@ public class ScanLanDeviceFragment extends Fragment {
 
 	private boolean start = true;
 	private String address;
-	public static final int DEFAULT_PORT = 9598;
 	private static final int MAX_DATA_PACKET_LENGTH = 40;
 	private byte[] buffer = new byte[MAX_DATA_PACKET_LENGTH];
 
 	// 控件
-	// private TextView tv_ip;
+	private TextView tv_local_ip;
 	private Button btn_scan;
 	private Button btn_scan_stop;
 	private ListView lv_iplist;
@@ -85,7 +83,7 @@ public class ScanLanDeviceFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_scan_landevice,
 				container, false);
 
-		// tv_ip = (TextView) view.findViewById(R.id.tv_ip);
+		tv_local_ip = (TextView) view.findViewById(R.id.tv_local_ip);
 		btn_scan = (Button) view.findViewById(R.id.btn_scan);
 		btn_scan_stop = (Button) view.findViewById(R.id.btn_scan_stop);
 		lv_iplist = (ListView) view.findViewById(R.id.lv_iplist);
@@ -97,17 +95,25 @@ public class ScanLanDeviceFragment extends Fragment {
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 
 		InitListener();
-
+		Init();
+		
+	}
+	
+	/**
+	 * 初始化其他配置
+	 */
+	private void Init(){
 		mIpList_adapter = new IpListAdapter(mIpList, activity);
 		lv_iplist.setAdapter(mIpList_adapter);
 
 		// 注册接收器
 		receiver = new MyReceiver();
 		IntentFilter filter = new IntentFilter();
-		filter.addAction("android.intent.action.recvip");
+		filter.addAction(GlobalData.GET_SCAN_DATA_ACTION);
 		activity.registerReceiver(receiver, filter);
 
 		mLocalIp = getIpAddress();
+		tv_local_ip.setText("本机IP："+String.valueOf(mLocalIp));
 		Log.d(TAG, mLocalIp);
 	}
 
@@ -129,7 +135,7 @@ public class ScanLanDeviceFragment extends Fragment {
 				Intent intent = new Intent();
 				intent.putExtra("int", STARE_SCAN);
 
-				intent.setAction("android.intent.action.recv_contrl");// action与接收器相同
+				intent.setAction(GlobalData.CTRL_SCAN_ACTION);// action与接收器相同
 				activity.sendBroadcast(intent);
 
 			}
@@ -152,11 +158,11 @@ public class ScanLanDeviceFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				//Intent startIntent = new Intent(activity,
-				//		LanDeviceControlActivity.class);
+				// Intent startIntent = new Intent(activity,
+				// LanDeviceControlActivity.class);
 				Intent startIntent = new Intent(activity,
 						LanDeviceControlActivity.class);
-				
+
 				startIntent.putExtra("ip", mIpList.get(position));
 				startActivity(startIntent);
 
@@ -182,9 +188,9 @@ public class ScanLanDeviceFragment extends Fragment {
 
 	}
 
-
 	/**
 	 * 获取本地IP地址(2)
+	 * 
 	 * @return
 	 */
 	private String getLocalIPAddress() {
@@ -214,7 +220,7 @@ public class ScanLanDeviceFragment extends Fragment {
 
 			Bundle bundle = intent.getExtras();
 			String str = bundle.getString("str");
-			
+
 			// 如果已经有了，就不添加
 			for (int i = 0; i < mIpList.size(); i++) {
 				if (str.equals(mIpList.get(i))) {
@@ -237,8 +243,8 @@ public class ScanLanDeviceFragment extends Fragment {
 
 		// 停止服务
 		activity.stopService(new Intent(activity, SendLanDataService.class));
-	
+
 		// 解除注册接收器
-        activity.unregisterReceiver(receiver);
+		activity.unregisterReceiver(receiver);
 	}
 }

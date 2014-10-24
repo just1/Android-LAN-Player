@@ -96,8 +96,6 @@ public class RecvLanDataService extends Service {
 		Intent intent = new Intent();
 
 		intent.putExtra("str", str);
-
-		// i++;
 		intent.setAction("android.intent.action.test");// action与接收器相同
 
 		sendBroadcast(intent);

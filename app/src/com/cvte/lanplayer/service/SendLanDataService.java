@@ -56,7 +56,7 @@ public class SendLanDataService extends Service {
 		// 注册接收器
 		receiver = new MyReceiver();
 		IntentFilter filter = new IntentFilter();
-		filter.addAction("android.intent.action.recv_contrl");
+		filter.addAction(GlobalData.CTRL_SCAN_ACTION);
 		registerReceiver(receiver, filter);
 
 		// 开启线程等待TCP消息到达
@@ -206,11 +206,8 @@ public class SendLanDataService extends Service {
 
 	private void SendMessage(String str) {
 		Intent intent = new Intent();
-
 		intent.putExtra("str", str);
-
-		// i++;
-		intent.setAction("android.intent.action.recvip");// action与接收器相同
+		intent.setAction(GlobalData.GET_SCAN_DATA_ACTION);// action与接收器相同
 
 		sendBroadcast(intent);
 	}

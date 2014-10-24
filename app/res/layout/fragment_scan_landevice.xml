@@ -4,30 +4,44 @@
     android:orientation="vertical" >
 
     <LinearLayout
-        android:id="@+id/ll_btn_group"
+        android:id="@+id/ll_ctrl_group"
         android:layout_width="fill_parent"
-        android:layout_height="40dp"
+        android:layout_height="80dp"
         android:layout_alignParentTop="true"
         android:layout_marginTop="10dp"
-        android:orientation="horizontal" >
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_scan"
+        <TextView
+            android:id="@+id/tv_local_ip"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:textSize="18dp"
+            android:text="本机IP：" 
+            android:gravity="center"/>
+
+        <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="40dp"
-            android:gravity="center"
-            android:text="开始扫描"
-            android:textSize="18sp"
-            android:layout_weight="1" />
+            android:orientation="horizontal" >
 
-        <Button
-            android:id="@+id/btn_scan_stop"
-            android:layout_width="fill_parent"
-            android:layout_height="40dp"
-            android:gravity="center"
-            android:text="停止扫描"
-            android:textSize="18sp"
-            android:layout_weight="1" />
+            <Button
+                android:id="@+id/btn_scan"
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="开始扫描"
+                android:textSize="18sp" />
+
+            <Button
+                android:id="@+id/btn_scan_stop"
+                android:layout_width="fill_parent"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="停止扫描"
+                android:textSize="18sp" />
+        </LinearLayout>
     </LinearLayout>
 
     <ListView
@@ -35,7 +49,7 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_below="@+id/ll_btn_group"
+        android:layout_below="@+id/ll_ctrl_group"
         android:layout_marginBottom="10dp" />
 
 </RelativeLayout>
