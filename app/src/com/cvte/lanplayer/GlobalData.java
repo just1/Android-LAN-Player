@@ -33,4 +33,10 @@ public class GlobalData {
 	 */
 	public static final String GET_SCAN_DATA_ACTION = "android.intent.action.get_scan_data";
 
+	
+	/*
+	 * 局域网其他设备扫描到本机时候的接收器 
+	 */
+	public static final String IS_SCANED_ACTION = "android.intent.action.is_scaned";
+
 }
