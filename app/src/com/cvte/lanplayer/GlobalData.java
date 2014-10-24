@@ -76,5 +76,11 @@ public class GlobalData {
 	 * 请求获取Bundle里面的数据
 	 */
 	public static final String GET_BUNDLE_DATA = "getdata";
-
+	
+	
+	/*
+	 * 发送文本消息命令：
+	 */
+	public static final String COMMAND_SEND_MSG = "msg";
+	
 }

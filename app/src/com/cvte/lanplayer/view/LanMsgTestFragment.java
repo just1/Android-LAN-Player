@@ -56,9 +56,10 @@ public class LanMsgTestFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				// 直接发送消息
+				// 加上发送头，再发送消息
 				SendSocketMessageUtil.getInstance(mActivity).SendMessage(
-						et_context.getText().toString(),
+						GlobalData.COMMAND_SEND_MSG
+						+ et_context.getText().toString(),
 						et_ip.getText().toString());
 			}
 		});

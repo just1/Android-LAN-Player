@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 
 import com.cvte.lanplayer.GlobalData;
+import com.cvte.lanplayer.constant.AppConstant;
+import com.cvte.lanplayer.utils.MediaPlayerUtil;
 import com.cvte.lanplayer.utils.RecvLanScanDeviceUtil;
 import com.cvte.lanplayer.utils.RecvSocketMessageUtil;
 
@@ -87,6 +89,14 @@ public class RecvLanDataService extends Service {
 				break;
 			case GlobalData.REQUSET_MUSIC_LIST:
 
+				//获取本机的音乐列表
+				//MediaPlayerUtil.getInstance(RecvLanDataService.this).getMusicList();
+				//AppConstant.MusicPlayData.myMusicList;
+				
+				
+				//发送本机的音乐列表
+				
+				
 				break;
 			}
 

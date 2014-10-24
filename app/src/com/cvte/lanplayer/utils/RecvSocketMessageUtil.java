@@ -105,7 +105,7 @@ public class RecvSocketMessageUtil {
 						String recv_data = br.readLine();
 
 						Log.d(TAG, "来自服务器的数据：" + recv_data);
-						SendMessage(recv_data);
+						HandleMessage(recv_data);
 											
 						br.close();
 						streamReader.close();
@@ -139,6 +139,17 @@ public class RecvSocketMessageUtil {
 				mSocketList.get(i).close();
 			}
 		}
+	}
+	
+	/**
+	 * 处理发过来的数据
+	 */
+	private void HandleMessage(String str){
+		if(str.startsWith(GlobalData.COMMAND_SEND_MSG)){
+			//截断消息位再发送
+			SendMessage(str.substring(GlobalData.COMMAND_SEND_MSG.length()));
+		}
+		//else if()
 	}
 	
 }

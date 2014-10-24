@@ -11,12 +11,6 @@
         android:textSize="18sp"
         android:text="" />
     
-    <EditText
-        android:id="@+id/et_context"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp"
-        android:text="" />
 
     <Button
         android:id="@+id/btn_test_send"
@@ -24,11 +18,6 @@
         android:layout_height="wrap_content"
         android:text="test_send" />
 
-    <Button
-        android:id="@+id/btn_test_recv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="test_recv" />
 
     <TextView
         android:id="@+id/tv_recv_data"
