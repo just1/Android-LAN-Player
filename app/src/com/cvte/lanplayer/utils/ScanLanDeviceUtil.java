@@ -24,7 +24,7 @@ public class ScanLanDeviceUtil {
 	private static Service mService;
 	private static ScanLanDeviceUtil instance = null;
 
-	//扫描和接收返回指令的线程
+	// 扫描和接收返回指令的线程
 	private Thread mTCPThread;
 	private BroadCastUdp mBroadCastUdp;
 
@@ -33,7 +33,7 @@ public class ScanLanDeviceUtil {
 	private ServerSocket ss = null;
 
 	private boolean start = true;
-	
+
 	private static final int MAX_DATA_PACKET_LENGTH = 40;
 	private byte[] buffer = new byte[MAX_DATA_PACKET_LENGTH];
 
@@ -59,8 +59,10 @@ public class ScanLanDeviceUtil {
 
 	/**
 	 * 停止扫描 清空开启的线程和socket
+	 * 
+	 * @throws IOException
 	 */
-	public void StopScan() {
+	public void StopScan() throws IOException {
 		if (mTCPThread != null) {
 			mTCPThread.interrupt();
 		}
@@ -73,31 +75,19 @@ public class ScanLanDeviceUtil {
 		}
 
 		if (socket != null) {
-			try {
-				socket.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			socket.close();
 		}
 
 		if (ss != null) {
-			try {
-				ss.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			ss.close();
 		}
 
-		
 	}
 
 	/**
 	 * 开始扫描
 	 * 
-	 * 开始扫描之后，接收方要启动一个GlobalData.GET_SCAN_DATA_ACTION
-	 * 的广播接收器才能接收搜索到的IP地址
+	 * 开始扫描之后，接收方要启动一个GlobalData.GET_SCAN_DATA_ACTION 的广播接收器才能接收搜索到的IP地址
 	 */
 	public void StartScan() {
 		start = true;
@@ -131,9 +121,9 @@ public class ScanLanDeviceUtil {
 		return null;
 	}
 
-	
 	/**
 	 * 找到相应的IP地址，则进行广播
+	 * 
 	 * @param str
 	 */
 	private void SendMessage(String str) {
@@ -192,7 +182,7 @@ public class ScanLanDeviceUtil {
 
 				BufferedReader in = null;
 				try {
-					ss = new ServerSocket(GlobalData.Socket_PORT);
+					ss = new ServerSocket(GlobalData.SOCKET_PORT);
 
 					socket = ss.accept();
 
@@ -231,7 +221,5 @@ public class ScanLanDeviceUtil {
 			}
 		}
 	}
-
-	
 
 }

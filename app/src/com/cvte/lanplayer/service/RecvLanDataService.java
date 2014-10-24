@@ -1,10 +1,13 @@
 package com.cvte.lanplayer.service;
 
+import java.io.IOException;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
 import com.cvte.lanplayer.utils.RecvLanScanDeviceUtil;
+import com.cvte.lanplayer.utils.RecvSocketMessageUtil;
 
 public class RecvLanDataService extends Service {
 
@@ -20,7 +23,7 @@ public class RecvLanDataService extends Service {
 		
 		//启动被其他局域网设备扫描到的接收监听
 		RecvLanScanDeviceUtil.getInstance(this).StartRecv();
-
+		RecvSocketMessageUtil.getInstance(this).StartRecv();
 	}
 
 
@@ -30,7 +33,19 @@ public class RecvLanDataService extends Service {
 		super.onDestroy();
 
 		//停止被其他局域网设备扫描到的接收监听
-		RecvLanScanDeviceUtil.getInstance(this).StopRecv();
+		try {
+			RecvLanScanDeviceUtil.getInstance(this).StopRecv();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		try {
+			RecvSocketMessageUtil.getInstance(this).StopRecv();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 

@@ -1,5 +1,7 @@
 package com.cvte.lanplayer.service;
 
+import java.io.IOException;
+
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -53,8 +55,13 @@ public class SendLanDataService extends Service {
 				
 			case GlobalData.STOP_SCAN:// 停止扫描
 				// 调用工具类的停止扫描方法
-				ScanLanDeviceUtil.getInstance(SendLanDataService.this)
-						.StopScan();
+				try {
+					ScanLanDeviceUtil.getInstance(SendLanDataService.this)
+							.StopScan();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				break;
 
 			}
@@ -63,8 +70,13 @@ public class SendLanDataService extends Service {
 
 	public void onDestroy() {
 		// 调用工具类的stopScan()
-		ScanLanDeviceUtil.getInstance(SendLanDataService.this)
-			.StopScan();
+		try {
+			ScanLanDeviceUtil.getInstance(SendLanDataService.this)
+				.StopScan();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		// 解除注册接收器
 		this.unregisterReceiver(mScanCtrl);

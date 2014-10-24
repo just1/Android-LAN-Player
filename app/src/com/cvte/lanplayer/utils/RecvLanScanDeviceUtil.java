@@ -78,7 +78,6 @@ public class RecvLanScanDeviceUtil {
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					try {
@@ -100,8 +99,12 @@ public class RecvLanScanDeviceUtil {
 
 							SendMessage("建立socket通信：" + ip + "\n");
 
-							socket = new Socket(ip, GlobalData.Socket_PORT);
-
+							socket = new Socket(ip, GlobalData.SOCKET_PORT);
+							/*
+							 * 以后这里可以加入socket的秘钥
+							 */
+							
+							
 						} catch (IOException e) {
 							e.printStackTrace();
 						} finally {
@@ -127,19 +130,15 @@ public class RecvLanScanDeviceUtil {
 	/**
 	 * 停止接收数据
 	 * 打断线程并清理现场
+	 * @throws IOException 
 	 */
-	public void StopRecv(){
+	public void StopRecv() throws IOException{
 		if (mRecvThread != null) {
 			mRecvThread.interrupt();
 		}
 
 		if (socket != null) {
-			try {
-				socket.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			socket.close();
 		}
 
 		if (udpSocket != null) {
