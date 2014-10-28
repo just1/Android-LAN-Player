@@ -31,7 +31,7 @@ public class SimpleClient extends Activity
 		//关闭输入流、socket
 		try
 		{
-			Socket socket = new Socket("172.18.53.182" , 30000);
+			Socket socket = new Socket("192.168.159.2" , 30000);
 			//将Socket对应的输入流包装成BufferedReader
 			BufferedReader br = new BufferedReader(
 				new InputStreamReader(socket.getInputStream()));

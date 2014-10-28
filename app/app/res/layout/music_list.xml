@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/white_bg" >
+    <LinearLayout 
+        android:id="@+id/lineartop"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="70px">
+        <!-- 顶端菜单键 -->
+        <ImageButton android:id="@+id/music_menu_top"
+            android:layout_width="175px"
+            android:layout_height="70px"
+            android:layout_weight="1"
+            android:background="@drawable/selector_music_btn"
+            android:src="@drawable/menu_top"/>
+        <ImageView 
+            android:id="@+id/imgverticalline"
+            android:layout_width="1px"
+            android:layout_height="70px"
+            android:src="@drawable/vertical_line">
+        </ImageView>
+        <!-- 顶端返回键 -->
+        <Button 
+            android:id="@+id/music_back_top"
+            android:layout_width="match_parent"
+            android:layout_height="70px"
+            android:layout_weight="1"
+            android:text="全部"
+            android:textSize="20sp"
+            android:gravity="center_vertical"
+            android:paddingLeft="20dp"
+            android:background="@drawable/selector_music_btn">
+            
+        </Button>
+    </LinearLayout>
+
+    <!-- 横向分隔线 -->
+    <ImageView 
+        android:id="@+id/horizontalline"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/horizontal_line"
+        android:layout_below="@+id/lineartop"/>
+    <!-- 音乐列表 -->
+    <ListView android:id="@+id/music_list"
+        android:layout_below="@+id/horizontalline"
+        android:layout_marginBottom="90px"
+        android:layout_width="match_parent"
+	    android:dividerHeight="0.6dp"
+	    android:divider="#c2c2c2"
+	    android:listSelector="@drawable/selector_list_item"
+        android:layout_height="wrap_content">
+    </ListView>
+    <RelativeLayout 
+        android:id="@+id/relativebottom"
+        android:layout_width="match_parent"
+        android:layout_height="90px"
+        android:layout_alignParentBottom="true"
+        android:background="@color/horizontal_line">
+        <LinearLayout 
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+			<!-- 歌手头像图片 -->
+            <ImageButton
+                android:id="@+id/music_artist_photo"
+                android:layout_width="80px"
+                android:layout_height="80px"
+                android:layout_margin="5px"
+                android:src="@drawable/gly" >
+			</ImageButton>
+			<LinearLayout android:orientation="vertical"
+			    android:layout_width="match_parent"
+			    android:layout_height="match_parent">
+			    <!-- 进度条 -->
+			    <SeekBar 
+	   				android:id="@+id/music_list_seekBar"
+	   				android:layout_width="fill_parent" 
+	   				android:layout_height="wrap_content"	
+	   				android:paddingLeft="5dp"
+	   				android:paddingRight="5dp"
+					android:max="100" 
+					android:progressDrawable="@drawable/seekbar_style"  
+	   				android:thumb="@drawable/seekbar_thumb"
+	   				android:background="@drawable/progress_buffering" >
+	   			</SeekBar>
+	   			<RelativeLayout 
+        			android:layout_alignParentBottom="true"
+        			android:layout_width="fill_parent"
+        			android:layout_height="wrap_content">
+        			<!-- 下一首按钮 -->
+        			<ImageButton 
+            			android:id="@+id/music_list_playNext"
+            			android:src="@drawable/handle_next"
+            			android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:layout_weight="1"
+            			android:layout_alignParentRight="true"
+            			android:background="@drawable/selector_music_btn"/>
+        			<!-- 播放暂停按钮 -->
+        			<ImageButton 
+            			android:id="@+id/music_list_play"
+            			android:src="@drawable/handle_play_normal"
+            			android:layout_width="wrap_content"
+            			android:layout_height="wrap_content"
+            			android:layout_weight="1"
+            			android:layout_toLeftOf="@+id/music_list_playNext"
+            			android:background="@drawable/selector_music_btn"/>
+        			<!-- 歌曲名称 -->
+        			<TextView 
+            			android:id="@+id/txt_musicname"
+            			android:layout_width="match_parent"
+            			android:layout_height="wrap_content"
+            			android:layout_toLeftOf="@+id/music_list_play"
+            			android:text="欢迎来到搜易音乐"
+            			android:textColor="@color/white_bg"
+            			android:layout_marginLeft="10dp"
+            			android:layout_centerVertical="true"
+           				android:textSize="16sp"
+            			android:singleLine="true"
+            			android:ellipsize="marquee"
+            			android:focusable="true" 
+		        		android:focusableInTouchMode="true"/>
+    			</RelativeLayout>
+			</LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</RelativeLayout>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list  xmlns:android="http://schemas.android.com/apk/res/android">  
+
+<!-- 	<item android:id="@android:id/background"-->
+<!-- 		 android:drawable="@drawable/progress_bg">-->
+<!--    </item>-->
+ 
+    <item android:id="@android:id/secondaryProgress">
+        <clip android:drawable="@drawable/progress_buffering" />
+<!--        <padding android:left="5.0dip" android:right="5.0dip" />-->
+    </item>
+    
+    <item android:id="@android:id/progress">
+        <clip android:drawable="@drawable/progress_playing" />
+<!--        <padding android:left="5.0dip" android:right="5.0dip" />-->
+    </item>
+    
+</layer-list>  
+ 
