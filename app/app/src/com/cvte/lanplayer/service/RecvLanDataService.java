@@ -9,15 +9,16 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
-import com.cvte.lanplayer.constant.AppConstant;
-import com.cvte.lanplayer.utils.MediaPlayerUtil;
 import com.cvte.lanplayer.utils.RecvLanScanDeviceUtil;
 import com.cvte.lanplayer.utils.RecvSocketMessageUtil;
 
 public class RecvLanDataService extends Service {
 
+	private static String TAG = "RecvLanDataService";
+	
 	// 收到消息，再分发处理
 	private RecvScoketMsgReceiver mRecvScoketMsgReceiver;
 
@@ -40,6 +41,9 @@ public class RecvLanDataService extends Service {
 		// 启动被其他局域网设备扫描到的接收监听
 		RecvLanScanDeviceUtil.getInstance(this).StartRecv();
 		RecvSocketMessageUtil.getInstance(this).StartRecv();
+		
+		
+		Log.d(TAG,"onCreate RecvLanDataService");
 	}
 
 	@Override
@@ -61,9 +65,13 @@ public class RecvLanDataService extends Service {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		
+		Log.d(TAG,"onDestroy SendLanDataService");
 
 	}
 
+	
+	//把收到的消息转发出去
 	private class RecvScoketMsgReceiver extends BroadcastReceiver {
 
 		// 自定义一个广播接收器
@@ -95,7 +103,6 @@ public class RecvLanDataService extends Service {
 				
 				
 				//发送本机的音乐列表
-				
 				
 				break;
 			}

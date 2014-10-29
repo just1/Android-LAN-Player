@@ -1,18 +1,14 @@
 package com.cvte.lanplayer.utils;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -33,7 +29,7 @@ public class RecvSocketMessageUtil {
 	private static Context mContext;
 	private static RecvSocketMessageUtil instance = null;
 
-	private Thread mRecvThread = null;
+	private static Thread mRecvThread = null;
 
 	ServerSocket mServerSocket = null;
 	List<Socket> mSocketList = new ArrayList<Socket>();
@@ -42,6 +38,13 @@ public class RecvSocketMessageUtil {
 	 * 私有默认构造子
 	 */
 	private RecvSocketMessageUtil() {
+
+		// 如果接收线程没有初始化，则进行初始化
+		if (mRecvThread == null) {
+			InitRecvThread();
+			
+			Log.d(TAG,"InitRecvThread");
+		}
 
 	}
 
@@ -69,15 +72,28 @@ public class RecvSocketMessageUtil {
 		Bundle data = new Bundle();
 		data.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.RECV_MSG);
 		data.putString(GlobalData.GET_BUNDLE_DATA, str);
-		
+
 		intent.putExtras(data);
 		intent.setAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);// action与接收器相同
-		
+
 		mContext.sendBroadcast(intent);
 	}
 
 	public void StartRecv() {
 
+		// 如果线程已经结束了，则重新开启线程
+		if (mRecvThread.getState() == Thread.State.TERMINATED) {
+			mRecvThread.start();
+			
+			Log.d(TAG,"StartRecv");
+		}
+
+	}
+
+	/**
+	 * 初始化接收线程
+	 */
+	private void InitRecvThread() {
 		mRecvThread = new Thread() {
 
 			@Override
@@ -95,8 +111,8 @@ public class RecvSocketMessageUtil {
 					Socket socket;
 					try {
 						socket = mServerSocket.accept();
-						
-						//加入队列之中，方便日后清理
+
+						// 加入队列之中，方便日后清理
 						mSocketList.add(socket);
 						InputStream nameStream = socket.getInputStream();
 						InputStreamReader streamReader = new InputStreamReader(
@@ -106,11 +122,11 @@ public class RecvSocketMessageUtil {
 
 						Log.d(TAG, "来自服务器的数据：" + recv_data);
 						HandleMessage(recv_data);
-											
+
 						br.close();
 						streamReader.close();
 						nameStream.close();
-												
+
 						socket.close();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -119,8 +135,6 @@ public class RecvSocketMessageUtil {
 				}
 			}
 		};
-		mRecvThread.start();
-
 	}
 
 	public void StopRecv() throws IOException {
@@ -132,24 +146,25 @@ public class RecvSocketMessageUtil {
 			mServerSocket.close();
 		}
 
-		
-		//清理所有有可能开过的线程
-		for(int i=0;i<mSocketList.size();i++){
-			if(mSocketList.get(i) != null){
+		// 清理所有有可能开过的线程
+		for (int i = 0; i < mSocketList.size(); i++) {
+			if (mSocketList.get(i) != null) {
 				mSocketList.get(i).close();
 			}
 		}
+		
+		Log.d(TAG,"StopRecv");
 	}
-	
+
 	/**
 	 * 处理发过来的数据
 	 */
-	private void HandleMessage(String str){
-		if(str.startsWith(GlobalData.COMMAND_SEND_MSG)){
-			//截断消息位再发送
+	private void HandleMessage(String str) {
+		if (str.startsWith(GlobalData.COMMAND_SEND_MSG)) {
+			// 截断消息位再发送
 			SendMessage(str.substring(GlobalData.COMMAND_SEND_MSG.length()));
 		}
-		//else if()
+		// else if()
 	}
-	
+
 }

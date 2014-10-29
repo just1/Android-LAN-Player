@@ -31,7 +31,7 @@ import com.cvte.lanplayer.service.SendLanDataService;
 
 public class ScanLanDeviceFragment extends Fragment {
 
-	private final String TAG = "ScanLanDevice";
+	private final String TAG = "ScanLanDeviceFragment";
 	// 通信秘钥
 	private final String KEY = "welcome to cvte";
 
@@ -49,7 +49,6 @@ public class ScanLanDeviceFragment extends Fragment {
 	private ListView lv_iplist;
 
 	private IpListAdapter mIpList_adapter;
-	private final int STARE_SCAN = 1;
 
 	private ScanDataReceiver mScanDataReceiver;
 
@@ -113,19 +112,28 @@ public class ScanLanDeviceFragment extends Fragment {
 			public void onClick(View arg0) {
 				// ScanLanDevice();
 
-				// 关闭接收的服务
-				activity.stopService(new Intent(activity,
-						RecvLanDataService.class));
-
-				// 启动扫描，开始服务
-				activity.startService(new Intent(activity,
-						SendLanDataService.class));
+				// // 关闭接收的服务
+				// activity.stopService(new Intent(activity,
+				// RecvLanDataService.class));
+				//
+				// // 启动扫描，开始服务
+				// activity.startService(new Intent(activity,
+				// SendLanDataService.class));
 
 				Intent intent = new Intent();
-				intent.putExtra("int", STARE_SCAN);
+				// intent.putExtra(GlobalData.GET_BUNDLE_COMMANT,
+				// GlobalData.STARE_SCAN);
+
+				Bundle data = new Bundle();
+				data.putInt(GlobalData.GET_BUNDLE_COMMANT,
+						GlobalData.STARE_SCAN);
+
+				intent.putExtras(data);
 
 				intent.setAction(GlobalData.CTRL_SCAN_ACTION);// action与接收器相同
 				activity.sendBroadcast(intent);
+
+				Log.d(TAG, "on click scan button");
 
 			}
 		});
@@ -133,11 +141,26 @@ public class ScanLanDeviceFragment extends Fragment {
 		btn_scan_stop.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				activity.stopService(new Intent(activity,
-						SendLanDataService.class));
+				// activity.stopService(new Intent(activity,
+				// SendLanDataService.class));
+				//
+				// activity.startService(new Intent(activity,
+				// RecvLanDataService.class));
 
-				activity.startService(new Intent(activity,
-						RecvLanDataService.class));
+				Intent intent = new Intent();
+
+				// intent.putExtra(GlobalData.GET_BUNDLE_COMMANT,
+				// GlobalData.STOP_SCAN);
+
+				Bundle data = new Bundle();
+				data.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.STOP_SCAN);
+
+				intent.putExtras(data);
+
+				intent.setAction(GlobalData.CTRL_SCAN_ACTION);// action与接收器相同
+				activity.sendBroadcast(intent);
+
+				Log.d(TAG, "on click canel scan button");
 			}
 		});
 
@@ -206,7 +229,7 @@ public class ScanLanDeviceFragment extends Fragment {
 		super.onDestroy();
 
 		// 停止服务
-		activity.stopService(new Intent(activity, SendLanDataService.class));
+		// activity.stopService(new Intent(activity, SendLanDataService.class));
 
 		// 解除注册接收器
 		activity.unregisterReceiver(mScanDataReceiver);

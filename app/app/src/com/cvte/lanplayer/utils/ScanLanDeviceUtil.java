@@ -25,8 +25,8 @@ public class ScanLanDeviceUtil {
 	private static ScanLanDeviceUtil instance = null;
 
 	// 扫描和接收返回指令的线程
-	private Thread mTCPThread;
-	private BroadCastUdp mBroadCastUdp;
+	private static Thread mTCPThread;
+	private static BroadCastUdpThread mBroadCastUdpThread;
 
 	private DatagramSocket udpSocket;
 	private Socket socket = null;
@@ -41,6 +41,20 @@ public class ScanLanDeviceUtil {
 	 * 私有默认构造子
 	 */
 	private ScanLanDeviceUtil() {
+
+		// 如果接收线程没有初始化，则进行初始化
+		if (mTCPThread == null) {
+
+			Log.d(TAG, "new mTCPThread");
+			mTCPThread = new Thread(new TcpReceive());
+		}
+
+		if (mBroadCastUdpThread == null) {
+
+			Log.d(TAG, "new mBroadCastUdpThread");
+			mBroadCastUdpThread = new BroadCastUdpThread(getLocalIPAddress()
+					.toString());
+		}
 
 	}
 
@@ -65,9 +79,13 @@ public class ScanLanDeviceUtil {
 	public void StopScan() throws IOException {
 		if (mTCPThread != null) {
 			mTCPThread.interrupt();
+
+			Log.d(TAG, "interrupt mTCPThread");
 		}
-		if (mBroadCastUdp != null) {
-			mBroadCastUdp.interrupt();
+		if (mBroadCastUdpThread != null) {
+			mBroadCastUdpThread.interrupt();
+
+			Log.d(TAG, "interrupt mBroadCastUdpThread");
 		}
 
 		if (udpSocket != null) {
@@ -93,12 +111,20 @@ public class ScanLanDeviceUtil {
 		start = true;
 
 		// 开启线程等待TCP消息到达
-		mTCPThread = new Thread(new TcpReceive());
-		mTCPThread.start();
+		if ((mTCPThread.getState() == Thread.State.TERMINATED)
+				|| (mTCPThread.getState() == Thread.State.NEW)) {
+			mTCPThread.start();
 
-		// 启动广播
-		mBroadCastUdp = new BroadCastUdp(getLocalIPAddress().toString());
-		mBroadCastUdp.start();
+			Log.d(TAG, "start mTCPThread");
+		}
+
+		// 启动UDP广播
+		if ((mBroadCastUdpThread.getState() == Thread.State.TERMINATED)
+				|| (mBroadCastUdpThread.getState() == Thread.State.NEW)) {
+			mBroadCastUdpThread.start();
+
+			Log.d(TAG, "start mBroadCastUdpThread");
+		}
 
 	}
 
@@ -134,10 +160,18 @@ public class ScanLanDeviceUtil {
 		mService.sendBroadcast(intent);
 	}
 
-	public class BroadCastUdp extends Thread {
+	/**
+	 * 
+	 * UDP扫描进程
+	 * 
+	 * @author JHYin
+	 * 
+	 */
+	public class BroadCastUdpThread extends Thread {
 		private String dataString;
+		private int BroadCastUdpCount = 10; // 用来记录发起的广播次数
 
-		public BroadCastUdp(String dataString) {
+		public BroadCastUdpThread(String dataString) {
 			this.dataString = dataString;
 		}
 
@@ -161,16 +195,31 @@ public class ScanLanDeviceUtil {
 				Log.e(TAG, e.toString());
 			}
 
-			try {
-				udpSocket.send(dataPacket);
-				sleep(10);
-			} catch (Exception e) {
-				Log.e(TAG, e.toString());
-			} finally {
-				if (udpSocket != null) {
-					udpSocket.close();
+			// 发起多次广播
+			for (int i = 0; i < BroadCastUdpCount; i++) {
+
+				try {
+					udpSocket.send(dataPacket);
+
+					Log.d(TAG, "send udpSocket in BroadCastUdpThread");
+
+					sleep(10);
+				} catch (Exception e) {
+					Log.e(TAG, e.toString());
+				} finally {
+					if (udpSocket != null) {
+						udpSocket.close();
+					}
+
 				}
 
+				// 休眠100s
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 
 		}

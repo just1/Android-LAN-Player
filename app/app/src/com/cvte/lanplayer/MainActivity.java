@@ -16,6 +16,7 @@ import android.support.v4.view.ViewPager;
 import android.view.Window;
 
 import com.cvte.lanplayer.service.RecvLanDataService;
+import com.cvte.lanplayer.service.SendLanDataService;
 import com.cvte.lanplayer.view.LanMsgTestFragment;
 import com.cvte.lanplayer.view.LocalPlayerFragment;
 import com.cvte.lanplayer.view.ScanLanDeviceFragment;
@@ -61,6 +62,9 @@ public class MainActivity extends FragmentActivity {
 
 		// 开始接收信息的服务
 		startService(new Intent(MainActivity.this, RecvLanDataService.class));
+		
+		// 启动扫描，开始服务
+		startService(new Intent(MainActivity.this, SendLanDataService.class));
 
 	}
 

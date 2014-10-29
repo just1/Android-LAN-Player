@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.utils.ScanLanDeviceUtil;
@@ -35,24 +36,28 @@ public class SendLanDataService extends Service {
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(GlobalData.CTRL_SCAN_ACTION);
 		registerReceiver(mScanCtrl, filter);
+		
+		Log.d(TAG,"onCreate SendLanDataService");
 
 	}
 
+	// 接收命令
 	public class ScanCtrlReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
 
 			Bundle bundle = intent.getExtras();
-			int control = bundle.getInt("int");
+			int control = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
 
 			switch (control) {
 			case GlobalData.STARE_SCAN:// 开始扫描
 				// 调用工具类的扫描方法
 				ScanLanDeviceUtil.getInstance(SendLanDataService.this)
 						.StartScan();
+				Log.d(TAG,"recv StartScanLAN Broadcast ");
 				break;
-				
+
 			case GlobalData.STOP_SCAN:// 停止扫描
 				// 调用工具类的停止扫描方法
 				try {
@@ -62,6 +67,9 @@ public class SendLanDataService extends Service {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
+				Log.d(TAG,"recv StopScanLAN Broadcast ");
+				
 				break;
 
 			}
@@ -71,15 +79,16 @@ public class SendLanDataService extends Service {
 	public void onDestroy() {
 		// 调用工具类的stopScan()
 		try {
-			ScanLanDeviceUtil.getInstance(SendLanDataService.this)
-				.StopScan();
+			ScanLanDeviceUtil.getInstance(SendLanDataService.this).StopScan();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		// 解除注册接收器
 		this.unregisterReceiver(mScanCtrl);
+		
+		Log.d(TAG,"onDestroy SendLanDataService");
 	}
 
 }
