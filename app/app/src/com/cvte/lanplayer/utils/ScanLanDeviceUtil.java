@@ -25,14 +25,14 @@ public class ScanLanDeviceUtil {
 	private static ScanLanDeviceUtil instance = null;
 
 	// 扫描和接收返回指令的线程
-	private static Thread mTCPThread;
-	private static BroadCastUdpThread mBroadCastUdpThread;
+	private static TcpReceiveThread mTCPThread;
 
 	private DatagramSocket udpSocket;
 	private Socket socket = null;
 	private ServerSocket ss = null;
 
-	private boolean start = true;
+	private boolean isTCPThreadStart = false;
+	private boolean isBroadCastUdpThreadStart = false;
 
 	private static final int MAX_DATA_PACKET_LENGTH = 40;
 	private byte[] buffer = new byte[MAX_DATA_PACKET_LENGTH];
@@ -41,21 +41,8 @@ public class ScanLanDeviceUtil {
 	 * 私有默认构造子
 	 */
 	private ScanLanDeviceUtil() {
-
-		// 如果接收线程没有初始化，则进行初始化
-		if (mTCPThread == null) {
-
-			Log.d(TAG, "new mTCPThread");
-			mTCPThread = new Thread(new TcpReceive());
-		}
-
-		if (mBroadCastUdpThread == null) {
-
-			Log.d(TAG, "new mBroadCastUdpThread");
-			mBroadCastUdpThread = new BroadCastUdpThread(getLocalIPAddress()
-					.toString());
-		}
-
+		
+		mTCPThread = new TcpReceiveThread();
 	}
 
 	/**
@@ -82,12 +69,7 @@ public class ScanLanDeviceUtil {
 
 			Log.d(TAG, "interrupt mTCPThread");
 		}
-		if (mBroadCastUdpThread != null) {
-			mBroadCastUdpThread.interrupt();
-
-			Log.d(TAG, "interrupt mBroadCastUdpThread");
-		}
-
+		
 		if (udpSocket != null) {
 			udpSocket.close();
 		}
@@ -108,22 +90,15 @@ public class ScanLanDeviceUtil {
 	 * 开始扫描之后，接收方要启动一个GlobalData.GET_SCAN_DATA_ACTION 的广播接收器才能接收搜索到的IP地址
 	 */
 	public void StartScan() {
-		start = true;
 
-		// 开启线程等待TCP消息到达
-		if ((mTCPThread.getState() == Thread.State.TERMINATED)
-				|| (mTCPThread.getState() == Thread.State.NEW)) {
+		//每按下一次，就开启一个UDP线程进行扫描
+		new BroadCastUdpThread(getLocalIPAddress().toString()).start();
+
+		//接收TCP回传消息的线程，一直开启，不会被关
+		if (mTCPThread.getState() == Thread.State.NEW) {
+			
+			
 			mTCPThread.start();
-
-			Log.d(TAG, "start mTCPThread");
-		}
-
-		// 启动UDP广播
-		if ((mBroadCastUdpThread.getState() == Thread.State.TERMINATED)
-				|| (mBroadCastUdpThread.getState() == Thread.State.NEW)) {
-			mBroadCastUdpThread.start();
-
-			Log.d(TAG, "start mBroadCastUdpThread");
 		}
 
 	}
@@ -175,6 +150,7 @@ public class ScanLanDeviceUtil {
 			this.dataString = dataString;
 		}
 
+		@SuppressWarnings("deprecation")
 		public void run() {
 			DatagramPacket dataPacket = null;
 
@@ -195,38 +171,33 @@ public class ScanLanDeviceUtil {
 				Log.e(TAG, e.toString());
 			}
 
-			// 发起多次广播
-			for (int i = 0; i < BroadCastUdpCount; i++) {
-
-				try {
+			try {
+				// 发起多次广播 -- 或者不用发出多次广播
+				for (int i = 0; i < BroadCastUdpCount; i++) {
 					udpSocket.send(dataPacket);
 
 					Log.d(TAG, "send udpSocket in BroadCastUdpThread");
 
-					sleep(10);
-				} catch (Exception e) {
-					Log.e(TAG, e.toString());
-				} finally {
-					if (udpSocket != null) {
-						udpSocket.close();
-					}
-
+					// 休眠100ms
+					sleep(100);
+				}
+			} catch (Exception e) {
+				Log.e(TAG, e.toString());
+			} finally {
+				if (udpSocket != null) {
+					udpSocket.close();
 				}
 
-				// 休眠100s
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
 
+			// 标记线程执行完毕
+			isBroadCastUdpThreadStart = false;
 		}
 	}
 
-	private class TcpReceive implements Runnable {
+	public class TcpReceiveThread extends Thread {
 		public void run() {
+
 			while (true) {
 
 				BufferedReader in = null;
@@ -251,8 +222,8 @@ public class ScanLanDeviceUtil {
 						final String ipString = sb.toString().trim();// "192.168.0.104:8731";
 
 						SendMessage(ipString);
-
 					}
+
 				} catch (IOException e) {
 					e.printStackTrace();
 				} finally {
@@ -267,7 +238,10 @@ public class ScanLanDeviceUtil {
 						e.printStackTrace();
 					}
 				}
+
 			}
+			// isTCPThreadStart = false;
+
 		}
 	}
 
