@@ -23,6 +23,11 @@ public class GlobalData {
 	public static final String CTRL_SCAN_ACTION = "android.intent.action.ctrl_scan";
 
 	/*
+	 * 控制扫描启动或停止的接收器
+	 */
+	public static final String CTRL_RECV_ACTION = "android.intent.action.ctrl_recv";
+
+	/*
 	 * 启动扫描
 	 */
 	public static final int STARE_SCAN = 1;
@@ -31,6 +36,16 @@ public class GlobalData {
 	 * 停止扫描
 	 */
 	public static final int STOP_SCAN = 2;
+
+	/*
+	 * 启动LAN接收
+	 */
+	public static final int STARE_LAN_RECV = 1;
+
+	/*
+	 * 停止LAN接收
+	 */
+	public static final int STOP_LAN_RECV = 2;
 
 	/*
 	 * 返回扫描结果的接收器
@@ -66,7 +81,7 @@ public class GlobalData {
 	 * 请求获取音乐列表
 	 */
 	public static final int REQUSET_MUSIC_LIST = 2;
-	
+
 	/*
 	 * 请求获取接收器的指令
 	 */
@@ -76,11 +91,10 @@ public class GlobalData {
 	 * 请求获取Bundle里面的数据
 	 */
 	public static final String GET_BUNDLE_DATA = "getdata";
-	
-	
+
 	/*
 	 * 发送文本消息命令：
 	 */
 	public static final String COMMAND_SEND_MSG = "msg";
-	
+
 }

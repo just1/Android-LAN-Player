@@ -82,7 +82,7 @@ public class RecvSocketMessageUtil {
 	public void StartRecv() {
 
 		// 如果线程已经结束了，则重新开启线程
-		if (mRecvThread.getState() == Thread.State.TERMINATED) {
+		if (mRecvThread.getState() == Thread.State.NEW) {
 			mRecvThread.start();
 			
 			Log.d(TAG,"StartRecv");

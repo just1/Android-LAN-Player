@@ -18,9 +18,12 @@ import com.cvte.lanplayer.utils.RecvSocketMessageUtil;
 public class RecvLanDataService extends Service {
 
 	private static String TAG = "RecvLanDataService";
-	
+
 	// 收到消息，再分发处理
 	private RecvScoketMsgReceiver mRecvScoketMsgReceiver;
+
+	// 控制接收
+	private RecvCtrlReceiver mRecvCtrlReceiver;
 
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -31,25 +34,32 @@ public class RecvLanDataService extends Service {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Log.d(TAG, "onCreate RecvLanDataService");
 
-		// 注册接收器
+		// 注册转发消息的接收器
 		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);
-		registerReceiver(mRecvScoketMsgReceiver, filter);
+		IntentFilter recvScoketFilter = new IntentFilter();
+		recvScoketFilter.addAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);
+		registerReceiver(mRecvScoketMsgReceiver, recvScoketFilter);
+
+		// 注册接收控制的接收器
+		mRecvCtrlReceiver = new RecvCtrlReceiver();
+		IntentFilter recvCtrlFilter = new IntentFilter();
+		recvCtrlFilter.addAction(GlobalData.CTRL_RECV_ACTION);
+		registerReceiver(mRecvCtrlReceiver, recvCtrlFilter);
 
 		// 启动被其他局域网设备扫描到的接收监听
-		RecvLanScanDeviceUtil.getInstance(this).StartRecv();
+		// RecvLanScanDeviceUtil.getInstance(this).StartRecv();
 		RecvSocketMessageUtil.getInstance(this).StartRecv();
-		
-		
-		Log.d(TAG,"onCreate RecvLanDataService");
+
 	}
 
 	@Override
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		super.onDestroy();
+
+		Log.d(TAG, "onDestroy SendLanDataService");
 
 		// 停止被其他局域网设备扫描到的接收监听
 		try {
@@ -65,13 +75,10 @@ public class RecvLanDataService extends Service {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		Log.d(TAG,"onDestroy SendLanDataService");
 
 	}
 
-	
-	//把收到的消息转发出去
+	// 把收到的消息转发出去
 	private class RecvScoketMsgReceiver extends BroadcastReceiver {
 
 		// 自定义一个广播接收器
@@ -85,7 +92,6 @@ public class RecvLanDataService extends Service {
 			switch (commant) {
 			case GlobalData.RECV_MSG:
 
-
 				Intent msg_intent = new Intent();
 				msg_intent.putExtras(bundle);
 				// action与接收器相同
@@ -97,16 +103,50 @@ public class RecvLanDataService extends Service {
 				break;
 			case GlobalData.REQUSET_MUSIC_LIST:
 
-				//获取本机的音乐列表
-				//MediaPlayerUtil.getInstance(RecvLanDataService.this).getMusicList();
-				//AppConstant.MusicPlayData.myMusicList;
-				
-				
-				//发送本机的音乐列表
-				
+				// 获取本机的音乐列表
+				// MediaPlayerUtil.getInstance(RecvLanDataService.this).getMusicList();
+				// AppConstant.MusicPlayData.myMusicList;
+
+				// 发送本机的音乐列表
+
 				break;
 			}
 
+		}
+	}
+
+	// 接收命令
+	private class RecvCtrlReceiver extends BroadcastReceiver {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			// TODO Auto-generated method stub
+
+			Bundle bundle = intent.getExtras();
+			int control = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
+
+			switch (control) {
+			case GlobalData.STARE_LAN_RECV:// 开始扫描
+				Log.d(TAG, "recv StartRecvLAN Broadcast ");
+
+				// 调用工具类的扫描方法
+				RecvLanScanDeviceUtil.getInstance(RecvLanDataService.this)
+						.StartRecv();
+				break;
+
+			case GlobalData.STOP_LAN_RECV:// 停止扫描
+
+				Log.d(TAG, "recv StopRecvLAN Broadcast ");
+				// 调用工具类的停止扫描方法
+				try {
+					RecvLanScanDeviceUtil.getInstance(RecvLanDataService.this)
+							.StopRecv();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				break;
+			}
 		}
 	}
 

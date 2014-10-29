@@ -31,18 +31,17 @@ public class SendLanDataService extends Service {
 	public void onCreate() {
 		super.onCreate();
 
+		Log.d(TAG, "onCreate SendLanDataService");
+
 		// 注册扫描控制的接收器
 		mScanCtrl = new ScanCtrlReceiver();
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(GlobalData.CTRL_SCAN_ACTION);
 		registerReceiver(mScanCtrl, filter);
-		
-		Log.d(TAG,"onCreate SendLanDataService");
-
 	}
 
 	// 接收命令
-	public class ScanCtrlReceiver extends BroadcastReceiver {
+	private class ScanCtrlReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			// TODO Auto-generated method stub
@@ -52,13 +51,16 @@ public class SendLanDataService extends Service {
 
 			switch (control) {
 			case GlobalData.STARE_SCAN:// 开始扫描
+				Log.d(TAG, "recv StartScanLAN Broadcast ");
+
 				// 调用工具类的扫描方法
 				ScanLanDeviceUtil.getInstance(SendLanDataService.this)
 						.StartScan();
-				Log.d(TAG,"recv StartScanLAN Broadcast ");
 				break;
 
 			case GlobalData.STOP_SCAN:// 停止扫描
+
+				Log.d(TAG, "recv StopScanLAN Broadcast ");
 				// 调用工具类的停止扫描方法
 				try {
 					ScanLanDeviceUtil.getInstance(SendLanDataService.this)
@@ -67,11 +69,8 @@ public class SendLanDataService extends Service {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
-				Log.d(TAG,"recv StopScanLAN Broadcast ");
-				
-				break;
 
+				break;
 			}
 		}
 	}
@@ -87,8 +86,8 @@ public class SendLanDataService extends Service {
 
 		// 解除注册接收器
 		this.unregisterReceiver(mScanCtrl);
-		
-		Log.d(TAG,"onDestroy SendLanDataService");
+
+		Log.d(TAG, "onDestroy SendLanDataService");
 	}
 
 }

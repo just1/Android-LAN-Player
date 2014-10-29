@@ -14,6 +14,7 @@ import java.util.Enumeration;
 
 import android.app.Service;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
@@ -41,7 +42,7 @@ public class ScanLanDeviceUtil {
 	 * 私有默认构造子
 	 */
 	private ScanLanDeviceUtil() {
-		
+
 		mTCPThread = new TcpReceiveThread();
 	}
 
@@ -65,11 +66,11 @@ public class ScanLanDeviceUtil {
 	 */
 	public void StopScan() throws IOException {
 		if (mTCPThread != null) {
-			mTCPThread.interrupt();
-
 			Log.d(TAG, "interrupt mTCPThread");
+
+			mTCPThread.interrupt();
 		}
-		
+
 		if (udpSocket != null) {
 			udpSocket.close();
 		}
@@ -91,13 +92,14 @@ public class ScanLanDeviceUtil {
 	 */
 	public void StartScan() {
 
-		//每按下一次，就开启一个UDP线程进行扫描
+		Log.d(TAG, "StartScan");
+
+		// 每按下一次，就开启一个UDP线程进行扫描
 		new BroadCastUdpThread(getLocalIPAddress().toString()).start();
 
-		//接收TCP回传消息的线程，一直开启，不会被关
+		// 接收TCP回传消息的线程，一直开启，不会被关
 		if (mTCPThread.getState() == Thread.State.NEW) {
-			
-			
+
 			mTCPThread.start();
 		}
 
@@ -150,9 +152,11 @@ public class ScanLanDeviceUtil {
 			this.dataString = dataString;
 		}
 
-		@SuppressWarnings("deprecation")
 		public void run() {
 			DatagramPacket dataPacket = null;
+
+			// 关闭扫描
+			StopLANRecv();
 
 			try {
 				udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
@@ -190,12 +194,43 @@ public class ScanLanDeviceUtil {
 
 			}
 
-			// 标记线程执行完毕
-			isBroadCastUdpThreadStart = false;
+			// 重新启动接收
+			StartLANRecv();
+
 		}
 	}
 
-	public class TcpReceiveThread extends Thread {
+	/**
+	 * 启动扫描
+	 */
+	private void StartLANRecv() {
+		Intent intent = new Intent();
+
+		Bundle data = new Bundle();
+		data.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.STARE_LAN_RECV);
+
+		intent.putExtras(data);
+		intent.setAction(GlobalData.CTRL_RECV_ACTION);// action与接收器相同
+
+		mService.sendBroadcast(intent);
+	}
+
+	/**
+	 * 停止扫描
+	 */
+	private void StopLANRecv() {
+		Intent intent = new Intent();
+
+		Bundle data = new Bundle();
+		data.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.STOP_LAN_RECV);
+
+		intent.putExtras(data);
+		intent.setAction(GlobalData.CTRL_RECV_ACTION);// action与接收器相同
+
+		mService.sendBroadcast(intent);
+	}
+
+	private class TcpReceiveThread extends Thread {
 		public void run() {
 
 			while (true) {

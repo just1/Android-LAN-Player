@@ -37,13 +37,6 @@ public class RecvLanScanDeviceUtil {
 	 */
 	private RecvLanScanDeviceUtil() {
 
-		// 如果接收线程没有初始化，则进行初始化
-		if (mRecvThread == null) {
-			InitRecvThread();
-
-			Log.d(TAG, "InitRecvThread");
-		}
-
 	}
 
 	/**
@@ -54,6 +47,7 @@ public class RecvLanScanDeviceUtil {
 		mService = service;
 		if (instance == null) {
 			instance = new RecvLanScanDeviceUtil();
+
 		}
 
 		return instance;
@@ -76,8 +70,15 @@ public class RecvLanScanDeviceUtil {
 	 */
 	public void StartRecv() {
 
+		// 如果接收线程没有初始化，则进行初始化
+		if (mRecvThread == null) {
+			InitRecvThread();
+
+			Log.d(TAG, "InitRecvThread");
+		}
+
 		// 如果线程已经结束了，则重新开启线程
-		if (mRecvThread.getState() == Thread.State.TERMINATED) {
+		if (mRecvThread.getState() == Thread.State.NEW) {
 			mRecvThread.start();
 
 			Log.d(TAG, "StartRecv");
@@ -102,11 +103,11 @@ public class RecvLanScanDeviceUtil {
 				}
 				while (true) {
 					// 不用连续扫描(有可能是这里导致出错)
-//					try {
-//						Thread.sleep(100);
-//					} catch (InterruptedException e1) {
-//						e1.printStackTrace();
-//					}
+					// try {
+					// Thread.sleep(100);
+					// } catch (InterruptedException e1) {
+					// e1.printStackTrace();
+					// }
 					try {
 						udpSocket.receive(udpPacket);
 					} catch (Exception e) {
@@ -117,13 +118,12 @@ public class RecvLanScanDeviceUtil {
 						final String codeString = new String(data, 0,
 								udpPacket.getLength());
 
-						Log.d(TAG,"收到IP地址：" + quest_ip + "的UDP请求\n" + "地址代码："
-								+ codeString );
-						
+						Log.d(TAG, "收到IP地址：" + quest_ip + "的UDP请求\n" + "地址代码："
+								+ codeString);
+
 						SendMessage("收到IP地址：" + quest_ip + "的UDP请求\n" + "地址代码："
 								+ codeString + "\n\n");
 
-						
 						try {
 							final String ip = udpPacket.getAddress().toString()
 									.substring(1);
@@ -162,6 +162,9 @@ public class RecvLanScanDeviceUtil {
 	public void StopRecv() throws IOException {
 		if (mRecvThread != null) {
 			mRecvThread.interrupt();
+
+			// 这样直接赋值为null不知道好不好
+			mRecvThread = null;
 		}
 
 		if (socket != null) {
@@ -170,6 +173,8 @@ public class RecvLanScanDeviceUtil {
 
 		if (udpSocket != null) {
 			udpSocket.close();
+
+			udpSocket = null;
 		}
 
 		Log.d(TAG, "StopRecv");
