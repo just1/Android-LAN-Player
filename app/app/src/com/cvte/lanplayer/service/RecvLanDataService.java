@@ -49,7 +49,7 @@ public class RecvLanDataService extends Service {
 		registerReceiver(mRecvCtrlReceiver, recvCtrlFilter);
 
 		// 启动被其他局域网设备扫描到的接收监听
-		// RecvLanScanDeviceUtil.getInstance(this).StartRecv();
+		RecvLanScanDeviceUtil.getInstance(this).StartRecv();
 		RecvSocketMessageUtil.getInstance(this).StartRecv();
 
 	}

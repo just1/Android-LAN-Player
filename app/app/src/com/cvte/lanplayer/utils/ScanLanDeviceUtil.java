@@ -155,8 +155,16 @@ public class ScanLanDeviceUtil {
 		public void run() {
 			DatagramPacket dataPacket = null;
 
-			// 关闭扫描
+			// 关闭接收端口扫描
 			StopLANRecv();
+
+			//大约延时100ms，等待关闭端口扫描
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
 			try {
 				udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
@@ -194,7 +202,7 @@ public class ScanLanDeviceUtil {
 
 			}
 
-			// 重新启动接收
+			// 重新启动接收端口
 			StartLANRecv();
 
 		}
