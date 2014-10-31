@@ -6,6 +6,12 @@ public class GlobalData {
 	 * UDP广播的端口
 	 */
 	public static final int UDP_PORT = 43708;
+	
+	
+	/*
+	 * 用于接收和发送LAN UDP socket的 线程的同步锁
+	 */
+	public static byte[] UDP_SOCKET_LOCK = new byte[0];
 
 	/*
 	 * Socket扫描用的的端口
@@ -17,15 +23,18 @@ public class GlobalData {
 	 */
 	public static final int SOCKET_TRANSMIT_PORT = 38281;
 
+	
+	
+	
+	
+	
+	/**
+	 * 进行LAN扫描
+	 */
 	/*
 	 * 控制扫描启动或停止的接收器
 	 */
 	public static final String CTRL_SCAN_ACTION = "android.intent.action.ctrl_scan";
-
-	/*
-	 * 控制扫描启动或停止的接收器
-	 */
-	public static final String CTRL_RECV_ACTION = "android.intent.action.ctrl_recv";
 
 	/*
 	 * 启动扫描
@@ -36,6 +45,15 @@ public class GlobalData {
 	 * 停止扫描
 	 */
 	public static final int STOP_SCAN = 2;
+	
+	
+	/**
+	 * 接收LAN扫描
+	 */
+	/*
+	 * 控制扫描启动或停止的接收器
+	 */
+	public static final String CTRL_RECV_ACTION = "android.intent.action.ctrl_recv";
 
 	/*
 	 * 启动LAN接收
@@ -47,6 +65,9 @@ public class GlobalData {
 	 */
 	public static final int STOP_LAN_RECV = 2;
 
+	
+	
+	
 	/*
 	 * 返回扫描结果的接收器
 	 */
@@ -67,11 +88,13 @@ public class GlobalData {
 	 */
 	public static final String RECV_SOCKET_FROM_SERVICE_ACTION = "android.intent.action.recv_lan_socket_from_service";
 
-	/*
-	 * 收到简单的文本信息
-	 */
-	public static final String RECV_SCAN = "recv_scan";
 
+
+	
+	
+	/**
+	 * SOCKET通信指令
+	 */
 	/*
 	 * 收到简单的文本信息
 	 */
@@ -82,6 +105,10 @@ public class GlobalData {
 	 */
 	public static final int REQUSET_MUSIC_LIST = 2;
 
+	
+	
+	
+	
 	/*
 	 * 请求获取接收器的指令
 	 */
@@ -96,5 +123,12 @@ public class GlobalData {
 	 * 发送文本消息命令：
 	 */
 	public static final String COMMAND_SEND_MSG = "msg";
+	
+	/*
+	 * 收到简单的文本信息
+	 */
+	public static final String RECV_SCAN = "recv_scan";
+	
+	
 
 }

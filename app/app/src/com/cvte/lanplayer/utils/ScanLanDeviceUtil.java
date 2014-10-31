@@ -153,58 +153,61 @@ public class ScanLanDeviceUtil {
 		}
 
 		public void run() {
-			DatagramPacket dataPacket = null;
 
-			// 关闭接收端口扫描
+			/*
+			 * 关闭接收端口扫描
+			 * 必须放在synchronized()同步代码块之前，否则无法获得锁
+			 */
 			StopLANRecv();
 
-			//大约延时100ms，等待关闭端口扫描
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			/*
+			 * 使用同步锁进行线程同步
+			 * 
+			 * 无须使用wait()和nodify() 因为在进入synchronized()的代码块的时候，就代表请求锁，然后假如没有锁，
+			 * 那么就要进行等待，而不用wait(); 当synchronized()的代码块执行完毕，就会自动释放锁，而不用nodify()通知
+			 */
+			synchronized (GlobalData.UDP_SOCKET_LOCK) {
+				DatagramPacket dataPacket = null;
+				try {
+					udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
 
-			try {
-				udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
+					dataPacket = new DatagramPacket(buffer,
+							MAX_DATA_PACKET_LENGTH);
+					byte[] data = dataString.getBytes();
+					dataPacket.setData(data);
+					dataPacket.setLength(data.length);
+					dataPacket.setPort(GlobalData.UDP_PORT);
 
-				dataPacket = new DatagramPacket(buffer, MAX_DATA_PACKET_LENGTH);
-				byte[] data = dataString.getBytes();
-				dataPacket.setData(data);
-				dataPacket.setLength(data.length);
-				dataPacket.setPort(GlobalData.UDP_PORT);
+					InetAddress broadcastAddr;
 
-				InetAddress broadcastAddr;
-
-				broadcastAddr = InetAddress.getByName("255.255.255.255");
-				dataPacket.setAddress(broadcastAddr);
-			} catch (Exception e) {
-				Log.e(TAG, e.toString());
-			}
-
-			try {
-				// 发起多次广播 -- 或者不用发出多次广播
-				for (int i = 0; i < BroadCastUdpCount; i++) {
-					udpSocket.send(dataPacket);
-
-					Log.d(TAG, "send udpSocket in BroadCastUdpThread");
-
-					// 休眠100ms
-					sleep(100);
-				}
-			} catch (Exception e) {
-				Log.e(TAG, e.toString());
-			} finally {
-				if (udpSocket != null) {
-					udpSocket.close();
+					broadcastAddr = InetAddress.getByName("255.255.255.255");
+					dataPacket.setAddress(broadcastAddr);
+				} catch (Exception e) {
+					Log.e(TAG, e.toString());
 				}
 
+				try {
+					// 发起多次广播 -- 或者不用发出多次广播
+					for (int i = 0; i < BroadCastUdpCount; i++) {
+						udpSocket.send(dataPacket);
+
+						Log.d(TAG, "send udpSocket in BroadCastUdpThread");
+
+						// 休眠100ms
+						sleep(100);
+					}
+				} catch (Exception e) {
+					Log.e(TAG, e.toString());
+				} finally {
+					if (udpSocket != null) {
+						udpSocket.close();
+					}
+
+				}
+
+				// 重新启动接收端口
+				StartLANRecv();
 			}
-
-			// 重新启动接收端口
-			StartLANRecv();
-
 		}
 	}
 

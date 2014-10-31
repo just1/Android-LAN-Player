@@ -107,60 +107,67 @@ public class RecvLanScanDeviceUtil {
 			@Override
 			public void run() {
 
-				byte[] data = new byte[256];
-				try {
-					udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
-					udpPacket = new DatagramPacket(data, data.length);
-				} catch (SocketException e1) {
-					e1.printStackTrace();
-				}
-				while (isRunThread) { // 控制线程的标志位
-					// 不用连续扫描(有可能是这里导致出错)
-					// try {
-					// Thread.sleep(100);
-					// } catch (InterruptedException e1) {
-					// e1.printStackTrace();
-					// }
+				/*
+				 * 使用同步锁进行线程同步
+				 * 
+				 * 无须使用wait()和nodify()
+				 * 因为在进入synchronized()的代码块的时候，就代表请求锁，然后假如没有锁，
+				 * 那么就要进行等待，而不用wait();
+				 * 当synchronized()的代码块执行完毕，就会自动释放锁，而不用nodify()通知
+				 */
+				synchronized (GlobalData.UDP_SOCKET_LOCK) {
+
+					byte[] data = new byte[256];
 					try {
-						udpSocket.receive(udpPacket);
-					} catch (Exception e) {
+						udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
+						udpPacket = new DatagramPacket(data, data.length);
+					} catch (SocketException e1) {
+						e1.printStackTrace();
 					}
-					if (null != udpPacket.getAddress()) {
-						final String quest_ip = udpPacket.getAddress()
-								.toString();
-						final String codeString = new String(data, 0,
-								udpPacket.getLength());
-
-						Log.d(TAG, "收到IP地址：" + quest_ip + "的UDP请求\n" + "地址代码："
-								+ codeString);
-
-						SendMessage("收到IP地址：" + quest_ip + "的UDP请求\n" + "地址代码："
-								+ codeString + "\n\n");
+					while (isRunThread) { // 控制线程的标志位
 
 						try {
-							final String ip = udpPacket.getAddress().toString()
-									.substring(1);
+							udpSocket.receive(udpPacket);
+						} catch (Exception e) {
+						}
+						if (null != udpPacket.getAddress()) {
+							final String quest_ip = udpPacket.getAddress()
+									.toString();
+							final String codeString = new String(data, 0,
+									udpPacket.getLength());
 
-							SendMessage("建立socket通信：" + ip + "\n");
+							Log.d(TAG, "收到IP地址：" + quest_ip + "的UDP请求\n"
+									+ "地址代码：" + codeString);
 
-							socket = new Socket(ip, GlobalData.SOCKET_PORT);
-							/*
-							 * 以后这里可以加入socket的秘钥
-							 */
+							SendMessage("收到IP地址：" + quest_ip + "的UDP请求\n"
+									+ "地址代码：" + codeString + "\n\n");
 
-						} catch (IOException e) {
-							e.printStackTrace();
-						} finally {
 							try {
-								if (null != socket) {
-									socket.close();
-								}
+								final String ip = udpPacket.getAddress()
+										.toString().substring(1);
+
+								SendMessage("建立socket通信：" + ip + "\n");
+
+								socket = new Socket(ip, GlobalData.SOCKET_PORT);
+								/*
+								 * 以后这里可以加入socket的秘钥
+								 */
+
 							} catch (IOException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
+							} finally {
+								try {
+									if (null != socket) {
+										socket.close();
+									}
+								} catch (IOException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 						}
 					}
+
 				}
 
 			}
@@ -173,23 +180,24 @@ public class RecvLanScanDeviceUtil {
 	 * @throws IOException
 	 */
 	public void StopRecv() throws IOException {
+
+		Log.d(TAG, "StopRecv");
+
 		/*
-		 * 两种控制线程终止的方法都能用
-		 *  1.使用interrupt 
-		 *  2.使用标志位，在线程的while循环里面判断该标志位。通过更改标志位让线程停掉
+		 * 两种控制线程终止的方法都能用 1.使用interrupt 2.使用标志位，在线程的while循环里面判断该标志位。通过更改标志位让线程停掉
 		 * 
 		 * 最后采用线程里面加标志位的方法，因为这样能完成最后的socket关闭等处理
 		 */
-		
+
 		/* 方法1 */
 		// if (mRecvThread != null) {
 		// mRecvThread.interrupt();
 		//
 		// mRecvThread = null;
 		// }
-		
+
 		/* 方法2 */
-		
+
 		// 控制标志位来停止线程的循环
 		isRunThread = false;
 		// 这样直接赋值为null不知道好不好
@@ -205,8 +213,6 @@ public class RecvLanScanDeviceUtil {
 			// 这样直接赋值为null不知道好不好
 			udpSocket = null;
 		}
-
-		Log.d(TAG, "StopRecv");
 
 	}
 }
