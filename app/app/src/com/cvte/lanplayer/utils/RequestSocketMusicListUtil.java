@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
@@ -12,6 +14,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
+import com.cvte.lanplayer.entity.SocketTranEntity;
 
 /**
  * 向其他设备发送获得音乐列表请求
@@ -68,20 +71,43 @@ public class RequestSocketMusicListUtil {
 				// 关闭输入流、socket
 				try {
 
+//					mSocket = new Socket(mTargetIP,
+//							GlobalData.SOCKET_TRANSMIT_PORT);
+//					OutputStream outputName = mSocket.getOutputStream();
+//					OutputStreamWriter outputWriter = new OutputStreamWriter(
+//							outputName);
+//					BufferedWriter bwName = new BufferedWriter(outputWriter);
+//					
+//					//写入请求获取音乐列表的指令
+//					bwName.write(GlobalData.COMMAND_HEAD_REQUSET_MUSIC_LIST);
+//					
+//					bwName.close();
+//					outputWriter.close();
+//					outputName.close();
+//					mSocket.close();
+					
+					// 实例化传输对象
+					SocketTranEntity msg = new SocketTranEntity();
+					msg.setmCommant(GlobalData.COMMAND_REQUSET_MUSIC_LIST);
+					
+					
+					// 连接到服务器端
 					mSocket = new Socket(mTargetIP,
 							GlobalData.SOCKET_TRANSMIT_PORT);
-					OutputStream outputName = mSocket.getOutputStream();
-					OutputStreamWriter outputWriter = new OutputStreamWriter(
-							outputName);
-					BufferedWriter bwName = new BufferedWriter(outputWriter);
-					
-					//写入请求获取音乐列表的指令
-					bwName.write(GlobalData.COMMAND_HEAD_REQUSET_MUSIC_LIST);
-					
-					bwName.close();
-					outputWriter.close();
-					outputName.close();
+					// 使用ObjectOutputStream和ObjectInputStream进行对象数据传输
+					ObjectOutputStream out = new ObjectOutputStream(
+							mSocket.getOutputStream());
+					ObjectInputStream in = new ObjectInputStream(
+							mSocket.getInputStream());
+					// 将客户端的对象数据流输出到服务器端去
+					out.writeObject(msg);
+					out.flush();
+
+					out.close();
+					in.close();
 					mSocket.close();
+					
+					
 
 				} catch (IOException e) {
 					e.printStackTrace();

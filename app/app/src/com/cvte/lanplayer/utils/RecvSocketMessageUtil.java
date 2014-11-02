@@ -132,27 +132,6 @@ public class RecvSocketMessageUtil {
 						HandleMessage(songList, socket.getInetAddress()
 								.getHostAddress());
 
-						// List cityList = songList.GetSongList();
-
-						// InputStream nameStream = socket.getInputStream();
-						// InputStreamReader streamReader = new
-						// InputStreamReader(
-						// nameStream);
-						// BufferedReader br = new BufferedReader(streamReader);
-						// String recv_data = br.readLine();
-						//
-						// Log.d(TAG, "来自： "
-						// + socket.getInetAddress().getHostAddress()
-						// + " 的消息" + recv_data);
-						//
-						// // 处理接收到的消息
-						// HandleMessage(recv_data, socket.getInetAddress()
-						// .getHostAddress());
-						//
-						// br.close();
-						// streamReader.close();
-						// nameStream.close();
-
 						socket.close();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
@@ -227,26 +206,43 @@ public class RecvSocketMessageUtil {
 
 		switch (command) {
 		case GlobalData.COMMAND_RECV_MSG:
-			Log.d(TAG,"收到数据包：COMMAND_RECV_MSG");
+			Log.d(TAG, "收到数据包：COMMAND_RECV_MSG");
 			// 收到文本信息：
 			Log.d(TAG,
 					"收到文本类型消息："
-							+ data.getmMessage().substring(GlobalData.COMMAND_HEAD_SEND_MSG
-									.length()));
+							+ data.getmMessage().substring(
+									GlobalData.COMMAND_HEAD_SEND_MSG.length()));
 
 			// 截断消息位再发送
 			SendMessage(data.getmMessage());
-			
-			
+
 			break;
 
 		case GlobalData.COMMAND_REQUSET_MUSIC_LIST:
-			Log.d(TAG,"收到数据包：COMMAND_REQUSET_MUSIC_LIST");
+			Log.d(TAG, "收到数据包：COMMAND_REQUSET_MUSIC_LIST");
+
+			Log.d(TAG, "收到IP: " + targetIP + " 请求获取本机的音乐列表");
+
+			Intent intent = new Intent();
+
+			Bundle bundle = new Bundle();
+			bundle.putInt(GlobalData.GET_BUNDLE_COMMANT,
+					GlobalData.COMMAND_REQUSET_MUSIC_LIST);
+			bundle.putString(GlobalData.GET_BUNDLE_DATA, targetIP);
+
+			intent.putExtras(bundle);
+			intent.setAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);// action与接收器相同
+
+			mContext.sendBroadcast(intent);
 
 			break;
 
 		case GlobalData.COMMAND_SEND_MUSIC_LIST:
-			Log.d(TAG,"收到数据包：COMMAND_SEND_MUSIC_LIST");
+			Log.d(TAG, "收到数据包：COMMAND_SEND_MUSIC_LIST");
+			// 暂时在这里输出音乐列表
+			for (int i = 0; i < data.getmMusicList().size(); i++) {
+				Log.d(TAG, "收到" + data.getmMusicList().get(i));
+			}
 
 			break;
 
