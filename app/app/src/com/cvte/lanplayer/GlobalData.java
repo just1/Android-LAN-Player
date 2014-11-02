@@ -98,15 +98,30 @@ public class GlobalData {
 	/*
 	 * 收到简单的文本信息
 	 */
-	public static final int RECV_MSG = 1;
-
+	public static final int COMMAND_RECV_MSG = 1;
+	
 	/*
 	 * 请求获取音乐列表
 	 */
-	public static final int REQUSET_MUSIC_LIST = 2;
+	public static final int COMMAND_REQUSET_MUSIC_LIST = 2;
+	
+	
 
+	/*
+	 * 发送音乐列表
+	 */
+	public static final int COMMAND_SEND_MUSIC_LIST = 3;
 	
+	/*
+	 * 发送文本消息命令的消息头：
+	 */
+	public static final String COMMAND_HEAD_SEND_MSG = "msg";
 	
+
+	/*
+	 * 请求获取音乐列表的消息头
+	 */
+	public static final String COMMAND_HEAD_REQUSET_MUSIC_LIST = "request_music_list";
 	
 	
 	/*
@@ -119,10 +134,7 @@ public class GlobalData {
 	 */
 	public static final String GET_BUNDLE_DATA = "getdata";
 
-	/*
-	 * 发送文本消息命令：
-	 */
-	public static final String COMMAND_SEND_MSG = "msg";
+
 	
 	/*
 	 * 收到简单的文本信息

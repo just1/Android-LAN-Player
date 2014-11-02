@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
+import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.SendSocketMessageUtil;
 
 public class LanMsgTestFragment extends Fragment {
@@ -54,11 +55,22 @@ public class LanMsgTestFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
-				// 加上发送头，再发送消息
-				SendSocketMessageUtil.getInstance(mActivity).SendMessage(
-						GlobalData.COMMAND_SEND_MSG
-						+ et_context.getText().toString(),
+
+				// 实例化传输对象
+				SocketTranEntity msg = new SocketTranEntity();
+				msg.setmCommant(GlobalData.COMMAND_RECV_MSG);
+				msg.setmMessage(et_context.getText().toString());
+
+				// 直接发送消息
+				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
 						et_ip.getText().toString());
+
+				
+				// 加上发送头，再发送消息
+				// SendSocketMessageUtil.getInstance(mActivity).SendMessage(
+				// GlobalData.COMMAND_HEAD_SEND_MSG
+				// + et_context.getText().toString(),
+				// et_ip.getText().toString());
 			}
 		});
 
@@ -80,11 +92,11 @@ public class LanMsgTestFragment extends Fragment {
 
 			Bundle bundle = intent.getExtras();
 
-			//获取指令
+			// 获取指令
 			int commant = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
 
-			//根据指令来进行处理
-			if (commant == GlobalData.RECV_MSG) {
+			// 根据指令来进行处理
+			if (commant == GlobalData.COMMAND_RECV_MSG) {
 				String str = bundle.getString(GlobalData.GET_BUNDLE_DATA);
 
 				// 把收到的数据显示出来

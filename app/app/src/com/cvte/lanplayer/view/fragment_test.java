@@ -56,9 +56,9 @@ public class fragment_test extends Fragment {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				// 直接发送消息
-				SendSocketMessageUtil.getInstance(mActivity).SendMessage(
-						et_context.getText().toString(),
-						et_ip.getText().toString());
+//				SendSocketMessageUtil.getInstance(mActivity).SendMessage(
+//						et_context.getText().toString(),
+//						et_ip.getText().toString());
 			}
 		});
 

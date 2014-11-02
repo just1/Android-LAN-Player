@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
+import com.cvte.lanplayer.utils.RequestSocketMusicListUtil;
 
 public class LanMusicListTestFragment extends Fragment {
 
@@ -48,16 +49,19 @@ public class LanMusicListTestFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
+
+				//发送获取音乐列表的请求
+				RequestSocketMusicListUtil.getInstance(mActivity)
+						.RequestSocketMusicList(et_ip.getText().toString());
+
 			}
 		});
 
-
 		// 注册接收器
-		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);
-		mActivity.registerReceiver(mRecvScoketMsgReceiver, filter);
+		// mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
+		// IntentFilter filter = new IntentFilter();
+		// filter.addAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);
+		// mActivity.registerReceiver(mRecvScoketMsgReceiver, filter);
 
 		return view;
 	}
@@ -70,10 +74,17 @@ public class LanMusicListTestFragment extends Fragment {
 		public void onReceive(Context context, Intent intent) {
 
 			Bundle bundle = intent.getExtras();
-			String str = bundle.getString("str");
 
-			// 把收到的数据显示出来
-			tv_recv.setText(str);
+			// 获取指令
+			int commant = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
+
+			// 根据指令来进行处理
+			if (commant == GlobalData.COMMAND_RECV_MSG) {
+				String str = bundle.getString(GlobalData.GET_BUNDLE_DATA);
+
+				// 把收到的数据显示出来
+				tv_recv.setText(str);
+			}
 
 		}
 	}

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
+import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.SendSocketMessageUtil;
 
 public class LanDeviceControlActivity extends Activity {
@@ -60,10 +61,15 @@ public class LanDeviceControlActivity extends Activity {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 
+				//实例化传输对象
+				SocketTranEntity msg = new SocketTranEntity();
+				msg.setmCommant(GlobalData.COMMAND_RECV_MSG);
+				msg.setmMessage("welcome to cvte ");
+				
 				// 直接发送消息
 				SendSocketMessageUtil
 						.getInstance(LanDeviceControlActivity.this)
-						.SendMessage("welcome to cvte ", targetIp);
+						.SendMessage(msg, targetIp);
 			}
 		});
 	}

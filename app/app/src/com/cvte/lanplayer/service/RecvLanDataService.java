@@ -12,8 +12,11 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
+import com.cvte.lanplayer.constant.AppConstant;
+import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.RecvLanScanDeviceUtil;
 import com.cvte.lanplayer.utils.RecvSocketMessageUtil;
+import com.cvte.lanplayer.utils.SendLocalMusicListUtil;
 
 public class RecvLanDataService extends Service {
 
@@ -90,7 +93,7 @@ public class RecvLanDataService extends Service {
 			int commant = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
 
 			switch (commant) {
-			case GlobalData.RECV_MSG:
+			case GlobalData.COMMAND_RECV_MSG:
 
 				Intent msg_intent = new Intent();
 				msg_intent.putExtras(bundle);
@@ -101,14 +104,34 @@ public class RecvLanDataService extends Service {
 				sendBroadcast(msg_intent);
 
 				break;
-			case GlobalData.REQUSET_MUSIC_LIST:
+			case GlobalData.COMMAND_REQUSET_MUSIC_LIST:
 
 				// 获取本机的音乐列表
-				// MediaPlayerUtil.getInstance(RecvLanDataService.this).getMusicList();
-				// AppConstant.MusicPlayData.myMusicList;
+
+				// 打印本机前5首歌的音乐文件名
+				Log.d(TAG, "打印前5首歌");
+				for (int i = 0; (i < 5)
+						&& (i < AppConstant.MusicPlayData.myMusicList.size()); i++) {
+
+					if (AppConstant.MusicPlayData.myMusicList.get(i) != null) {
+						Log.d(TAG, AppConstant.MusicPlayData.myMusicList.get(i)
+								.getFileName());
+
+					}
+				}
 
 				// 发送本机的音乐列表
 
+				// 封装一个对象实例,把音乐列表传过来
+				SocketTranEntity musicList = new SocketTranEntity();
+				
+				musicList.setmCommant(GlobalData.COMMAND_SEND_MUSIC_LIST);
+				musicList.setmMusicList(AppConstant.MusicPlayData.myMusicList);
+
+				String targetIP = bundle.getString(GlobalData.GET_BUNDLE_DATA);
+
+				SendLocalMusicListUtil.getInstance(RecvLanDataService.this)
+						.SendMusicList(musicList, targetIP);
 				break;
 			}
 
