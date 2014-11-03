@@ -10,13 +10,13 @@ import android.widget.TextView;
 
 import com.cvte.lanplayer.R;
 
-public class IpListAdapter extends BaseAdapter {
+public class MyListAdapter extends BaseAdapter {
 
 	// 音乐文件名的List
 	private List<String> musicList;
 	private Context context;
 
-	public IpListAdapter(List<String> musicList, Context context) {
+	public MyListAdapter(List<String> musicList, Context context) {
 		this.musicList = musicList;
 		this.context = context;
 	}

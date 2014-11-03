@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
-import com.cvte.lanplayer.adapter.IpListAdapter;
+import com.cvte.lanplayer.adapter.MyListAdapter;
 import com.cvte.lanplayer.service.RecvLanDataService;
 import com.cvte.lanplayer.service.SendLanDataService;
 
@@ -48,7 +48,7 @@ public class ScanLanDeviceFragment extends Fragment {
 	private Button btn_scan_stop;
 	private ListView lv_iplist;
 
-	private IpListAdapter mIpList_adapter;
+	private MyListAdapter mIpList_adapter;
 
 	private ScanDataReceiver mScanDataReceiver;
 
@@ -91,7 +91,7 @@ public class ScanLanDeviceFragment extends Fragment {
 	 * 初始化其他配置
 	 */
 	private void Init() {
-		mIpList_adapter = new IpListAdapter(mIpList, activity);
+		mIpList_adapter = new MyListAdapter(mIpList, activity);
 		lv_iplist.setAdapter(mIpList_adapter);
 
 		// 注册接收器

@@ -55,9 +55,6 @@ public class LanTestMusicListFragment extends Fragment {
 			public void onClick(View arg0) {
 
 				// 发送获取音乐列表的请求
-//				RequestSocketMusicListUtil.getInstance()
-//						.RequestSocketMusicList(et_ip.getText().toString());
-				
 				// 实例化传输对象
 				SocketTranEntity msg = new SocketTranEntity();
 				msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_LIST);
@@ -105,7 +102,6 @@ public class LanTestMusicListFragment extends Fragment {
 							+ data.getmMusicList().get(i).getFileName()
 							+ '\n');
 				}
-
 			}
 
 		}
