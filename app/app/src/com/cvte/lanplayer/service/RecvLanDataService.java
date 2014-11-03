@@ -17,6 +17,7 @@ import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.RecvLanScanDeviceUtil;
 import com.cvte.lanplayer.utils.RecvSocketMessageUtil;
 import com.cvte.lanplayer.utils.SendSocketMessageUtil;
+import com.cvte.lanplayer.utils.SocketManager;
 
 public class RecvLanDataService extends Service {
 
@@ -45,6 +46,10 @@ public class RecvLanDataService extends Service {
 		// 启动被其他局域网设备扫描到的接收监听
 		RecvLanScanDeviceUtil.getInstance(this).StartRecv();
 		RecvSocketMessageUtil.getInstance(this).StartRecv();
+		
+		
+		//启动文件接收监听
+		SocketManager.getInstance().StartRecv();
 
 	}
 

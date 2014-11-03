@@ -22,6 +22,14 @@ public class GlobalData {
 		 * Socket通信的端口
 		 */
 		public static final int SOCKET_TRANSMIT_PORT = 38281;
+		
+		
+		/*
+		 * Socket文件传输端口
+		 */
+		public static final int SOCKET_FILE_TRANSMIT_PORT = 38381;
+		
+		
 	}
 
 	public class LANScanCtrl {
