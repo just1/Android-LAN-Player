@@ -19,11 +19,6 @@ public class GlobalData {
 		public static final int UDP_PORT = 43708;
 
 		/*
-		 * Socket扫描用的的端口
-		 */
-		public static final int SOCKET_PORT = 8080;
-
-		/*
 		 * Socket通信的端口
 		 */
 		public static final int SOCKET_TRANSMIT_PORT = 38281;

@@ -16,7 +16,7 @@ import com.cvte.lanplayer.constant.AppConstant;
 import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.RecvLanScanDeviceUtil;
 import com.cvte.lanplayer.utils.RecvSocketMessageUtil;
-import com.cvte.lanplayer.utils.SendLocalMusicListUtil;
+import com.cvte.lanplayer.utils.SendSocketMessageUtil;
 
 public class RecvLanDataService extends Service {
 
@@ -133,8 +133,10 @@ public class RecvLanDataService extends Service {
 			musicList.setmMusicList(AppConstant.MusicPlayData.myMusicList);
 
 			// 发送音乐列表
-			SendLocalMusicListUtil.getInstance(RecvLanDataService.this)
-					.SendMusicList(musicList, targetIP);
+			// SendLocalMusicListUtil.getInstance(RecvLanDataService.this).SendMusicList(musicList,
+			// targetIP);
+			SendSocketMessageUtil.getInstance(RecvLanDataService.this)
+					.SendMessage(musicList, targetIP);
 
 			break;
 
@@ -171,15 +173,16 @@ public class RecvLanDataService extends Service {
 			// 进行广播，把消息转发出去
 			Intent lan_ask_intent = new Intent();
 			Bundle lan_ask_bundle = new Bundle();
-			
-			//输入传输命令
+
+			// 输入传输命令
 			lan_ask_bundle.putInt(
 					GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
 					GlobalData.SocketTranCommand.COMMAND_LAN_ASK);
-			
-			//输入发送方的IP地址
+
+			// 输入发送方的IP地址
 			lan_ask_bundle.putString(
-					GlobalData.SocketTranCommand.GET_BUNDLE_COMMON_DATA, data.getmSendIP());
+					GlobalData.SocketTranCommand.GET_BUNDLE_COMMON_DATA,
+					data.getmSendIP());
 
 			lan_ask_intent.putExtras(lan_ask_bundle);
 			lan_ask_intent

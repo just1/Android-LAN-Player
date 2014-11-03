@@ -19,7 +19,7 @@ import android.widget.TextView;
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.entity.SocketTranEntity;
-import com.cvte.lanplayer.utils.RequestSocketMusicListUtil;
+import com.cvte.lanplayer.utils.SendSocketMessageUtil;
 
 public class LanTestMusicListFragment extends Fragment {
 
@@ -55,8 +55,15 @@ public class LanTestMusicListFragment extends Fragment {
 			public void onClick(View arg0) {
 
 				// 发送获取音乐列表的请求
-				RequestSocketMusicListUtil.getInstance()
-						.RequestSocketMusicList(et_ip.getText().toString());
+//				RequestSocketMusicListUtil.getInstance()
+//						.RequestSocketMusicList(et_ip.getText().toString());
+				
+				// 实例化传输对象
+				SocketTranEntity msg = new SocketTranEntity();
+				msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_LIST);
+
+				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
+						et_ip.getText().toString());
 
 			}
 		});
