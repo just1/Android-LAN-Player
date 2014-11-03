@@ -8,13 +8,11 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.entity.SocketTranEntity;
+import com.cvte.lanplayer.service.RecvLanDataService;
 
 /**
  * 接收其他设备的socket消息
@@ -30,13 +28,15 @@ public class RecvSocketMessageUtil {
 
 	private final String TAG = "RecvSocketMessageUtil";
 
-	private static Context mContext;
 	private static RecvSocketMessageUtil instance = null;
 
 	private static Thread mRecvThread = null;
 
 	ServerSocket mServerSocket = null;
 	List<Socket> mSocketList = new ArrayList<Socket>();
+
+	// 用于收到消息后回调
+	private static RecvLanDataService mRkdService;
 
 	/**
 	 * 私有默认构造子
@@ -55,9 +55,12 @@ public class RecvSocketMessageUtil {
 	/**
 	 * 静态工厂方法
 	 */
-	public static synchronized RecvSocketMessageUtil getInstance(Context context) {
+	public static synchronized RecvSocketMessageUtil getInstance(
+			RecvLanDataService rkdService) {
 
-		mContext = context;
+		// mContext = context;
+		mRkdService = rkdService;
+
 		if (instance == null) {
 			instance = new RecvSocketMessageUtil();
 		}
@@ -65,23 +68,6 @@ public class RecvSocketMessageUtil {
 		return instance;
 	}
 
-	/**
-	 * 收到相应的IP地址的数据，则进行广播转发出去
-	 * 
-	 * @param str
-	 */
-	private void SendMessage(String str) {
-		Intent intent = new Intent();
-
-		Bundle data = new Bundle();
-		data.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.COMMAND_RECV_MSG);
-		data.putString(GlobalData.GET_BUNDLE_DATA, str);
-
-		intent.putExtras(data);
-		intent.setAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);// action与接收器相同
-
-		mContext.sendBroadcast(intent);
-	}
 
 	public void StartRecv() {
 
@@ -128,9 +114,9 @@ public class RecvSocketMessageUtil {
 						SocketTranEntity songList = (SocketTranEntity) in
 								.readObject();
 
-						// 处理收到的数据
-						HandleMessage(songList, socket.getInetAddress()
-								.getHostAddress());
+						// 回调service处理收到的数据
+						mRkdService.handleSocketCommand(songList, socket
+								.getInetAddress().getHostAddress());
 
 						socket.close();
 					} catch (IOException e) {
@@ -164,90 +150,8 @@ public class RecvSocketMessageUtil {
 		Log.d(TAG, "StopRecv");
 	}
 
-	/**
-	 * 处理发过来的数据
-	 * 
-	 * str:发过来的原始文本消息 targetIP：发送方的IP地址
-	 */
-	private void HandleMessage(SocketTranEntity data, String targetIP) {
+	
 
-		// if (str.startsWith(GlobalData.COMMAND_HEAD_SEND_MSG)) { // 文本消息通信
-		//
-		// // 收到文本信息：
-		// Log.d(TAG,
-		// "收到文本类型消息："
-		// + str.substring(GlobalData.COMMAND_HEAD_SEND_MSG
-		// .length()));
-		//
-		// // 截断消息位再发送
-		// SendMessage(str
-		// .substring(GlobalData.COMMAND_HEAD_SEND_MSG.length()));
-		// }
-		// // 如果是要请求获取本机的音乐列表
-		// else if (str.startsWith(GlobalData.COMMAND_HEAD_REQUSET_MUSIC_LIST))
-		// {
-		// Log.d(TAG, "收到IP: " + targetIP + " 请求获取本机的音乐列表");
-		//
-		// Intent intent = new Intent();
-		//
-		// Bundle data = new Bundle();
-		// data.putInt(GlobalData.GET_BUNDLE_COMMANT,
-		// GlobalData.COMMAND_REQUSET_MUSIC_LIST);
-		// data.putString(GlobalData.GET_BUNDLE_DATA, targetIP);
-		//
-		// intent.putExtras(data);
-		// intent.setAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);//
-		// action与接收器相同
-		//
-		// mContext.sendBroadcast(intent);
-		// }
-
-		int command = data.getmCommant();
-
-		switch (command) {
-		case GlobalData.COMMAND_RECV_MSG:
-			Log.d(TAG, "收到数据包：COMMAND_RECV_MSG");
-			// 收到文本信息：
-			Log.d(TAG,
-					"收到文本类型消息："
-							+ data.getmMessage().substring(
-									GlobalData.COMMAND_HEAD_SEND_MSG.length()));
-
-			// 截断消息位再发送
-			SendMessage(data.getmMessage());
-
-			break;
-
-		case GlobalData.COMMAND_REQUSET_MUSIC_LIST:
-			Log.d(TAG, "收到数据包：COMMAND_REQUSET_MUSIC_LIST");
-
-			Log.d(TAG, "收到IP: " + targetIP + " 请求获取本机的音乐列表");
-
-			Intent intent = new Intent();
-
-			Bundle bundle = new Bundle();
-			bundle.putInt(GlobalData.GET_BUNDLE_COMMANT,
-					GlobalData.COMMAND_REQUSET_MUSIC_LIST);
-			bundle.putString(GlobalData.GET_BUNDLE_DATA, targetIP);
-
-			intent.putExtras(bundle);
-			intent.setAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);// action与接收器相同
-
-			mContext.sendBroadcast(intent);
-
-			break;
-
-		case GlobalData.COMMAND_SEND_MUSIC_LIST:
-			Log.d(TAG, "收到数据包：COMMAND_SEND_MUSIC_LIST");
-			// 暂时在这里输出音乐列表
-			for (int i = 0; i < data.getmMusicList().size(); i++) {
-				Log.d(TAG, "收到" + data.getmMusicList().get(i).getFileName());
-			}
-
-			break;
-
-		}
-
-	}
+	
 
 }

@@ -22,9 +22,6 @@ public class RecvLanDataService extends Service {
 
 	private static String TAG = "RecvLanDataService";
 
-	// 收到消息，再分发处理
-	private RecvScoketMsgReceiver mRecvScoketMsgReceiver;
-
 	// 控制接收
 	private RecvCtrlReceiver mRecvCtrlReceiver;
 
@@ -38,12 +35,6 @@ public class RecvLanDataService extends Service {
 	public void onCreate() {
 		super.onCreate();
 		Log.d(TAG, "onCreate RecvLanDataService");
-
-		// 注册转发消息的接收器
-		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
-		IntentFilter recvScoketFilter = new IntentFilter();
-		recvScoketFilter.addAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);
-		registerReceiver(mRecvScoketMsgReceiver, recvScoketFilter);
 
 		// 注册接收控制的接收器
 		mRecvCtrlReceiver = new RecvCtrlReceiver();
@@ -80,63 +71,84 @@ public class RecvLanDataService extends Service {
 		}
 
 	}
+	
+	/**
+	 * 放在RecvSocketMessageUtil里面回调，处理socket传入的消息
+	 */
+	public void handleSocketCommand(SocketTranEntity data, String targetIP){
+		int command = data.getmCommant();
 
-	// 把收到的消息转发出去
-	private class RecvScoketMsgReceiver extends BroadcastReceiver {
+		switch (command) {
+		//文本类型消息
+		case GlobalData.COMMAND_RECV_MSG:
+			Log.d(TAG, "收到数据包：COMMAND_RECV_MSG");
+			// 收到文本信息：
+			Log.d(TAG, "收到文本类型消息：" + data.getmMessage());
 
-		// 自定义一个广播接收器
-		@Override
-		public void onReceive(Context context, Intent intent) {
+			//SendMessage(data.getmMessage());
+			
+			
+			//进行广播，把消息转发出去
+			Intent msg_intent = new Intent();
 
-			Bundle bundle = intent.getExtras();
-			// 获取指令
-			int commant = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
+			Bundle msg_bundle = new Bundle();
+			msg_bundle.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.COMMAND_RECV_MSG);
+			msg_bundle.putString(GlobalData.GET_BUNDLE_DATA, data.getmMessage());
 
-			switch (commant) {
-			case GlobalData.COMMAND_RECV_MSG:
+			msg_intent.putExtras(msg_bundle);
+			msg_intent.setAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);// action与接收器相同
 
-				Intent msg_intent = new Intent();
-				msg_intent.putExtras(bundle);
-				// action与接收器相同
-				msg_intent
-						.setAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);
+			sendBroadcast(msg_intent);
+			
+			break;
 
-				sendBroadcast(msg_intent);
+		//请求获取音乐列表
+		case GlobalData.COMMAND_REQUSET_MUSIC_LIST:
+			Log.d(TAG, "收到数据包：COMMAND_REQUSET_MUSIC_LIST");
 
-				break;
-			case GlobalData.COMMAND_REQUSET_MUSIC_LIST:
+			Log.d(TAG, "收到IP: " + targetIP + " 请求获取本机的音乐列表");
+			
+			// 获取本机的音乐列表
 
-				// 获取本机的音乐列表
+			// 打印本机前5首歌的音乐文件名
+			Log.d(TAG, "打印前5首歌");
+			for (int i = 0; (i < 5)
+					&& (i < AppConstant.MusicPlayData.myMusicList.size()); i++) {
 
-				// 打印本机前5首歌的音乐文件名
-				Log.d(TAG, "打印前5首歌");
-				for (int i = 0; (i < 5)
-						&& (i < AppConstant.MusicPlayData.myMusicList.size()); i++) {
+				if (AppConstant.MusicPlayData.myMusicList.get(i) != null) {
+					Log.d(TAG, AppConstant.MusicPlayData.myMusicList.get(i)
+							.getFileName());
 
-					if (AppConstant.MusicPlayData.myMusicList.get(i) != null) {
-						Log.d(TAG, AppConstant.MusicPlayData.myMusicList.get(i)
-								.getFileName());
-
-					}
 				}
-
-				// 发送本机的音乐列表
-
-				// 封装一个对象实例,把音乐列表传过来
-				SocketTranEntity musicList = new SocketTranEntity();
-				
-				musicList.setmCommant(GlobalData.COMMAND_SEND_MUSIC_LIST);
-				musicList.setmMusicList(AppConstant.MusicPlayData.myMusicList);
-
-				String targetIP = bundle.getString(GlobalData.GET_BUNDLE_DATA);
-
-				SendLocalMusicListUtil.getInstance(RecvLanDataService.this)
-						.SendMusicList(musicList, targetIP);
-				break;
 			}
+
+			// 发送本机的音乐列表
+
+			// 封装一个对象实例,把音乐列表传过来
+			SocketTranEntity musicList = new SocketTranEntity();
+			
+			musicList.setmCommant(GlobalData.COMMAND_SEND_MUSIC_LIST);
+			musicList.setmMusicList(AppConstant.MusicPlayData.myMusicList);
+
+			//发送音乐列表
+			SendLocalMusicListUtil.getInstance(RecvLanDataService.this)
+					.SendMusicList(musicList, targetIP);
+			
+			break;
+
+		//收到音乐列表
+		case GlobalData.COMMAND_SEND_MUSIC_LIST:
+			Log.d(TAG, "收到数据包：COMMAND_SEND_MUSIC_LIST");
+			// 暂时在这里输出音乐列表
+			for (int i = 0; i < data.getmMusicList().size(); i++) {
+				Log.d(TAG, "收到" + data.getmMusicList().get(i).getFileName());
+			}
+
+			break;
 
 		}
 	}
+	
 
 	// 接收命令
 	private class RecvCtrlReceiver extends BroadcastReceiver {
