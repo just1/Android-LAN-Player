@@ -144,6 +144,21 @@ public class RecvLanDataService extends Service {
 				Log.d(TAG, "收到" + data.getmMusicList().get(i).getFileName());
 			}
 
+			
+			
+			//进行广播，把消息转发出去
+			Intent music_list_intent = new Intent();
+
+			Bundle music_list_bundle = new Bundle();
+			music_list_bundle.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.COMMAND_SEND_MUSIC_LIST);
+			music_list_bundle.putSerializable(GlobalData.GET_BUNDLE_DATA, data);
+
+			music_list_intent.putExtras(music_list_bundle);
+			music_list_intent.setAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);// action与接收器相同
+
+			sendBroadcast(music_list_intent);
+			
+			
 			break;
 
 		}

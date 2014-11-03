@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,10 +18,13 @@ import android.widget.TextView;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
+import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.RequestSocketMusicListUtil;
 
 public class LanMusicListTestFragment extends Fragment {
 
+	private final String TAG = "LanMusicListTestFragment";
+	
 	private Button btn_test_send;
 	private TextView tv_recv;
 	private EditText et_ip;
@@ -50,7 +54,7 @@ public class LanMusicListTestFragment extends Fragment {
 			@Override
 			public void onClick(View arg0) {
 
-				//发送获取音乐列表的请求
+				// 发送获取音乐列表的请求
 				RequestSocketMusicListUtil.getInstance(mActivity)
 						.RequestSocketMusicList(et_ip.getText().toString());
 
@@ -58,10 +62,10 @@ public class LanMusicListTestFragment extends Fragment {
 		});
 
 		// 注册接收器
-		// mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
-		// IntentFilter filter = new IntentFilter();
-		// filter.addAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);
-		// mActivity.registerReceiver(mRecvScoketMsgReceiver, filter);
+		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);
+		mActivity.registerReceiver(mRecvScoketMsgReceiver, filter);
 
 		return view;
 	}
@@ -72,18 +76,29 @@ public class LanMusicListTestFragment extends Fragment {
 		// 自定义一个广播接收器
 		@Override
 		public void onReceive(Context context, Intent intent) {
+			Log.d(TAG, "RECV:COMMAND");
 
 			Bundle bundle = intent.getExtras();
 
 			// 获取指令
 			int commant = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
 
-			// 根据指令来进行处理
-			if (commant == GlobalData.COMMAND_RECV_MSG) {
-				String str = bundle.getString(GlobalData.GET_BUNDLE_DATA);
+			// 假如是发送音乐列表
+			if (commant == GlobalData.COMMAND_SEND_MUSIC_LIST) {
+				Log.d(TAG, "RECV:COMMAND_SEND_MUSIC_LIST");
+
+				SocketTranEntity data = (SocketTranEntity) bundle
+						.getSerializable(GlobalData.GET_BUNDLE_DATA);
 
 				// 把收到的数据显示出来
-				tv_recv.setText(str);
+
+				tv_recv.setText(""); // 清空
+				for (int i = 0; i < data.getmMusicList().size(); i++) {
+					tv_recv.setText(tv_recv.getText()
+							+ data.getmMusicList().get(i).getFileName()
+							+ '\n');
+				}
+
 			}
 
 		}
