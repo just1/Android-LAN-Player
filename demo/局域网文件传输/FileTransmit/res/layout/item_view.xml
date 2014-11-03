@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <ImageView
+	    android:id="@+id/image"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"
+	    android:src="@drawable/folder" />
+	<ImageView
+	    android:id="@+id/select"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:layout_alignParentTop="true"
+	    android:layout_marginRight="5dp"
+	    android:layout_marginTop="5dp"
+	    android:tag="0" />
+	<TextView
+        android:id="@+id/file_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/image"
+        android:layout_alignParentTop="true"
+        android:text="TextView" />
+	<TextView
+        android:id="@+id/file_path"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:layout_below="@id/file_name"
+        android:visibility="invisible" />
+
+	<TextView
+	    android:id="@+id/file_type"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/file_name"
+	    android:text="TextView"
+	    android:visibility="invisible" />
+
+	<TextView
+	    android:id="@+id/file_parent"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/file_name"
+	    android:text="TextView"
+	    android:visibility="invisible" />
+
+	
+	
+</RelativeLayout>
