@@ -1,6 +1,10 @@
 package com.cvte.lanplayer.data;
 
-public class MusicData {
+import java.io.Serializable;
+
+public class MusicData implements Serializable{
+	
+	
 	//索引号
 	private int _MusicID;
 	//文件名

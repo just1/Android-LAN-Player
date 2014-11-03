@@ -241,7 +241,7 @@ public class RecvSocketMessageUtil {
 			Log.d(TAG, "收到数据包：COMMAND_SEND_MUSIC_LIST");
 			// 暂时在这里输出音乐列表
 			for (int i = 0; i < data.getmMusicList().size(); i++) {
-				Log.d(TAG, "收到" + data.getmMusicList().get(i));
+				Log.d(TAG, "收到" + data.getmMusicList().get(i).getFileName());
 			}
 
 			break;
