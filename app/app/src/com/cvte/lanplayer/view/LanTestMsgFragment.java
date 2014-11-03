@@ -20,7 +20,7 @@ import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.SendSocketMessageUtil;
 
-public class LanMsgTestFragment extends Fragment {
+public class LanTestMsgFragment extends Fragment {
 
 	private Button btn_test_send;
 

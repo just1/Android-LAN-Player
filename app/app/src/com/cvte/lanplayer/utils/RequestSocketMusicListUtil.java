@@ -1,17 +1,9 @@
 package com.cvte.lanplayer.utils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
-
-import android.content.Context;
-import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.entity.SocketTranEntity;
@@ -24,9 +16,8 @@ import com.cvte.lanplayer.entity.SocketTranEntity;
  */
 public class RequestSocketMusicListUtil {
 
-	private final String TAG = "GetSocketMusicListUtil";
+	private final String TAG = "RequestSocketMusicListUtil";
 
-	private static Context mContext;
 	private static RequestSocketMusicListUtil instance = null;
 
 	private Thread mSendThread = null;
@@ -44,10 +35,8 @@ public class RequestSocketMusicListUtil {
 	/**
 	 * 静态工厂方法
 	 */
-	public static synchronized RequestSocketMusicListUtil getInstance(
-			Context context) {
+	public static synchronized RequestSocketMusicListUtil getInstance() {
 
-		mContext = context;
 		if (instance == null) {
 			instance = new RequestSocketMusicListUtil();
 		}
@@ -71,26 +60,10 @@ public class RequestSocketMusicListUtil {
 				// 关闭输入流、socket
 				try {
 
-//					mSocket = new Socket(mTargetIP,
-//							GlobalData.SOCKET_TRANSMIT_PORT);
-//					OutputStream outputName = mSocket.getOutputStream();
-//					OutputStreamWriter outputWriter = new OutputStreamWriter(
-//							outputName);
-//					BufferedWriter bwName = new BufferedWriter(outputWriter);
-//					
-//					//写入请求获取音乐列表的指令
-//					bwName.write(GlobalData.COMMAND_HEAD_REQUSET_MUSIC_LIST);
-//					
-//					bwName.close();
-//					outputWriter.close();
-//					outputName.close();
-//					mSocket.close();
-					
 					// 实例化传输对象
 					SocketTranEntity msg = new SocketTranEntity();
 					msg.setmCommant(GlobalData.COMMAND_REQUSET_MUSIC_LIST);
-					
-					
+
 					// 连接到服务器端
 					mSocket = new Socket(mTargetIP,
 							GlobalData.SOCKET_TRANSMIT_PORT);
@@ -106,8 +79,6 @@ public class RequestSocketMusicListUtil {
 					out.close();
 					in.close();
 					mSocket.close();
-					
-					
 
 				} catch (IOException e) {
 					e.printStackTrace();

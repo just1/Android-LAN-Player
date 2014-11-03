@@ -17,8 +17,9 @@ import android.view.Window;
 
 import com.cvte.lanplayer.service.RecvLanDataService;
 import com.cvte.lanplayer.service.SendLanDataService;
-import com.cvte.lanplayer.view.LanMsgTestFragment;
-import com.cvte.lanplayer.view.LanMusicListTestFragment;
+import com.cvte.lanplayer.view.LanTestFileFragment;
+import com.cvte.lanplayer.view.LanTestMsgFragment;
+import com.cvte.lanplayer.view.LanTestMusicListFragment;
 import com.cvte.lanplayer.view.LocalPlayerFragment;
 import com.cvte.lanplayer.view.ScanLanDeviceFragment;
 
@@ -53,13 +54,15 @@ public class MainActivity extends FragmentActivity {
 
 		fragmentList.add(new LocalPlayerFragment());
 		fragmentList.add(new ScanLanDeviceFragment());
-		fragmentList.add(new LanMsgTestFragment());
-		fragmentList.add(new LanMusicListTestFragment());
+		fragmentList.add(new LanTestMsgFragment());
+		fragmentList.add(new LanTestMusicListFragment());
+		fragmentList.add(new LanTestFileFragment());
 		
 		titleList.add("播放");
 		titleList.add("扫描");
 		titleList.add("测试消息通信");
 		titleList.add("测试获取列表");
+		titleList.add("测试发送文件");
 
 		vp.setAdapter(adapter);
 

@@ -21,7 +21,7 @@ import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.RequestSocketMusicListUtil;
 
-public class LanMusicListTestFragment extends Fragment {
+public class LanTestMusicListFragment extends Fragment {
 
 	private final String TAG = "LanMusicListTestFragment";
 	
@@ -43,7 +43,7 @@ public class LanMusicListTestFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.fragment_lanmsg_test, container,
+		View view = inflater.inflate(R.layout.fragment_lan_musiclist_test, container,
 				false);
 		btn_test_send = (Button) view.findViewById(R.id.btn_test_send);
 		tv_recv = (TextView) view.findViewById(R.id.tv_recv_data);
@@ -55,7 +55,7 @@ public class LanMusicListTestFragment extends Fragment {
 			public void onClick(View arg0) {
 
 				// 发送获取音乐列表的请求
-				RequestSocketMusicListUtil.getInstance(mActivity)
+				RequestSocketMusicListUtil.getInstance()
 						.RequestSocketMusicList(et_ip.getText().toString());
 
 			}
