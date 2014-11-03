@@ -62,11 +62,11 @@ public class RequestSocketMusicListUtil {
 
 					// 实例化传输对象
 					SocketTranEntity msg = new SocketTranEntity();
-					msg.setmCommant(GlobalData.COMMAND_REQUSET_MUSIC_LIST);
+					msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_LIST);
 
 					// 连接到服务器端
 					mSocket = new Socket(mTargetIP,
-							GlobalData.SOCKET_TRANSMIT_PORT);
+							GlobalData.TranPort.SOCKET_TRANSMIT_PORT);
 					// 使用ObjectOutputStream和ObjectInputStream进行对象数据传输
 					ObjectOutputStream out = new ObjectOutputStream(
 							mSocket.getOutputStream());

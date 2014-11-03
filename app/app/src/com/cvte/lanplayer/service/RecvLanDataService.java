@@ -39,7 +39,7 @@ public class RecvLanDataService extends Service {
 		// 注册接收控制的接收器
 		mRecvCtrlReceiver = new RecvCtrlReceiver();
 		IntentFilter recvCtrlFilter = new IntentFilter();
-		recvCtrlFilter.addAction(GlobalData.CTRL_RECV_ACTION);
+		recvCtrlFilter.addAction(GlobalData.LANScanCtrl.CTRL_LAN_RECV_ACTION);
 		registerReceiver(mRecvCtrlReceiver, recvCtrlFilter);
 
 		// 启动被其他局域网设备扫描到的接收监听
@@ -71,43 +71,44 @@ public class RecvLanDataService extends Service {
 		}
 
 	}
-	
+
 	/**
 	 * 放在RecvSocketMessageUtil里面回调，处理socket传入的消息
 	 */
-	public void handleSocketCommand(SocketTranEntity data, String targetIP){
+	public void handleSocketCommand(SocketTranEntity data, String targetIP) {
 		int command = data.getmCommant();
 
 		switch (command) {
-		//文本类型消息
-		case GlobalData.COMMAND_RECV_MSG:
+		// 文本类型消息
+		case GlobalData.SocketTranCommand.COMMAND_RECV_MSG:
 			Log.d(TAG, "收到数据包：COMMAND_RECV_MSG");
 			// 收到文本信息：
 			Log.d(TAG, "收到文本类型消息：" + data.getmMessage());
 
-			//SendMessage(data.getmMessage());
-			
-			
-			//进行广播，把消息转发出去
+			// 进行广播，把消息转发出去
 			Intent msg_intent = new Intent();
 
 			Bundle msg_bundle = new Bundle();
-			msg_bundle.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.COMMAND_RECV_MSG);
-			msg_bundle.putString(GlobalData.GET_BUNDLE_DATA, data.getmMessage());
+			msg_bundle.putInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
+					GlobalData.SocketTranCommand.COMMAND_RECV_MSG);
+			msg_bundle.putString(
+					GlobalData.SocketTranCommand.GET_BUNDLE_COMMON_DATA,
+					data.getmMessage());
 
 			msg_intent.putExtras(msg_bundle);
-			msg_intent.setAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);// action与接收器相同
+			msg_intent
+					.setAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);// action与接收器相同
 
 			sendBroadcast(msg_intent);
-			
+
 			break;
 
-		//请求获取音乐列表
-		case GlobalData.COMMAND_REQUSET_MUSIC_LIST:
+		// 请求获取音乐列表
+		case GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_LIST:
 			Log.d(TAG, "收到数据包：COMMAND_REQUSET_MUSIC_LIST");
 
 			Log.d(TAG, "收到IP: " + targetIP + " 请求获取本机的音乐列表");
-			
+
 			// 获取本机的音乐列表
 
 			// 打印本机前5首歌的音乐文件名
@@ -126,44 +127,70 @@ public class RecvLanDataService extends Service {
 
 			// 封装一个对象实例,把音乐列表传过来
 			SocketTranEntity musicList = new SocketTranEntity();
-			
-			musicList.setmCommant(GlobalData.COMMAND_SEND_MUSIC_LIST);
+
+			musicList
+					.setmCommant(GlobalData.SocketTranCommand.COMMAND_SEND_MUSIC_LIST);
 			musicList.setmMusicList(AppConstant.MusicPlayData.myMusicList);
 
-			//发送音乐列表
+			// 发送音乐列表
 			SendLocalMusicListUtil.getInstance(RecvLanDataService.this)
 					.SendMusicList(musicList, targetIP);
-			
+
 			break;
 
-		//收到音乐列表
-		case GlobalData.COMMAND_SEND_MUSIC_LIST:
+		// 收到音乐列表
+		case GlobalData.SocketTranCommand.COMMAND_SEND_MUSIC_LIST:
 			Log.d(TAG, "收到数据包：COMMAND_SEND_MUSIC_LIST");
 			// 暂时在这里输出音乐列表
 			for (int i = 0; i < data.getmMusicList().size(); i++) {
 				Log.d(TAG, "收到" + data.getmMusicList().get(i).getFileName());
 			}
 
-			
-			
-			//进行广播，把消息转发出去
+			// 进行广播，把消息转发出去
 			Intent music_list_intent = new Intent();
 
 			Bundle music_list_bundle = new Bundle();
-			music_list_bundle.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.COMMAND_SEND_MUSIC_LIST);
-			music_list_bundle.putSerializable(GlobalData.GET_BUNDLE_DATA, data);
+			music_list_bundle.putInt(
+					GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
+					GlobalData.SocketTranCommand.COMMAND_SEND_MUSIC_LIST);
+			music_list_bundle.putSerializable(
+					GlobalData.SocketTranCommand.GET_BUNDLE_COMMON_DATA, data);
 
 			music_list_intent.putExtras(music_list_bundle);
-			music_list_intent.setAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);// action与接收器相同
+			music_list_intent
+					.setAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);// action与接收器相同
 
 			sendBroadcast(music_list_intent);
+
+			break;
+
+		// 收到局域网扫描的确认包
+		case GlobalData.SocketTranCommand.COMMAND_LAN_ASK:
+			Log.d(TAG, "收到数据包：COMMAND_LAN_ASK");
+
+			// 进行广播，把消息转发出去
+			Intent lan_ask_intent = new Intent();
+			Bundle lan_ask_bundle = new Bundle();
 			
+			//输入传输命令
+			lan_ask_bundle.putInt(
+					GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
+					GlobalData.SocketTranCommand.COMMAND_LAN_ASK);
 			
+			//输入发送方的IP地址
+			lan_ask_bundle.putString(
+					GlobalData.SocketTranCommand.GET_BUNDLE_COMMON_DATA, data.getmSendIP());
+
+			lan_ask_intent.putExtras(lan_ask_bundle);
+			lan_ask_intent
+					.setAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);// action与接收器相同
+
+			sendBroadcast(lan_ask_intent);
+
 			break;
 
 		}
 	}
-	
 
 	// 接收命令
 	private class RecvCtrlReceiver extends BroadcastReceiver {
@@ -172,10 +199,11 @@ public class RecvLanDataService extends Service {
 			// TODO Auto-generated method stub
 
 			Bundle bundle = intent.getExtras();
-			int control = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
+			int control = bundle
+					.getInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT);
 
 			switch (control) {
-			case GlobalData.STARE_LAN_RECV:// 开始扫描
+			case GlobalData.LANScanCtrl.STARE_LAN_RECV:// 开始扫描
 				Log.d(TAG, "recv StartRecvLAN Broadcast ");
 
 				// 调用工具类的扫描方法
@@ -183,7 +211,7 @@ public class RecvLanDataService extends Service {
 						.StartRecv();
 				break;
 
-			case GlobalData.STOP_LAN_RECV:// 停止扫描
+			case GlobalData.LANScanCtrl.STOP_LAN_RECV:// 停止扫描
 
 				Log.d(TAG, "recv StopRecvLAN Broadcast ");
 				// 调用工具类的停止扫描方法

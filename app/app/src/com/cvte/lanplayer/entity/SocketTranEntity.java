@@ -24,7 +24,29 @@ public class SocketTranEntity implements Serializable {
 	private List<MusicData> mMusicList;
 	//文本消息
 	private String mMessage;	
+	//发送方IP
+	private String mSendIP;	
+	//接收方IP
+	private String mRecvIP;	
 	
+	
+	
+	public String getmSendIP() {
+		return mSendIP;
+	}
+
+	public void setmSendIP(String mSendIP) {
+		this.mSendIP = mSendIP;
+	}
+
+	public String getmRecvIP() {
+		return mRecvIP;
+	}
+
+	public void setmRecvIP(String mRecvIP) {
+		this.mRecvIP = mRecvIP;
+	}
+
 	public int getmCommant() {
 		return mCommant;
 	}

@@ -58,14 +58,13 @@ public class LanTestMsgFragment extends Fragment {
 
 				// 实例化传输对象
 				SocketTranEntity msg = new SocketTranEntity();
-				msg.setmCommant(GlobalData.COMMAND_RECV_MSG);
+				msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_RECV_MSG);
 				msg.setmMessage(et_context.getText().toString());
 
 				// 直接发送消息
 				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
 						et_ip.getText().toString());
 
-				
 				// 加上发送头，再发送消息
 				// SendSocketMessageUtil.getInstance(mActivity).SendMessage(
 				// GlobalData.COMMAND_HEAD_SEND_MSG
@@ -77,7 +76,7 @@ public class LanTestMsgFragment extends Fragment {
 		// 注册接收器
 		mRecvScoketMsgReceiver = new RecvSocketReceiver();
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);
+		filter.addAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);
 		mActivity.registerReceiver(mRecvScoketMsgReceiver, filter);
 
 		return view;
@@ -93,11 +92,13 @@ public class LanTestMsgFragment extends Fragment {
 			Bundle bundle = intent.getExtras();
 
 			// 获取指令
-			int commant = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
+			int commant = bundle
+					.getInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT);
 
 			// 根据指令来进行处理
-			if (commant == GlobalData.COMMAND_RECV_MSG) {
-				String str = bundle.getString(GlobalData.GET_BUNDLE_DATA);
+			if (commant == GlobalData.SocketTranCommand.COMMAND_RECV_MSG) {
+				String str = bundle
+						.getString(GlobalData.SocketTranCommand.GET_BUNDLE_COMMON_DATA);
 
 				// 把收到的数据显示出来
 				tv_recv.setText(str);

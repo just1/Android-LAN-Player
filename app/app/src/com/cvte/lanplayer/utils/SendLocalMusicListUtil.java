@@ -70,7 +70,7 @@ public class SendLocalMusicListUtil {
 
 					// 连接到服务器端
 					mSocket = new Socket(mTargetIP,
-							GlobalData.SOCKET_TRANSMIT_PORT);
+							GlobalData.TranPort.SOCKET_TRANSMIT_PORT);
 					// 使用ObjectOutputStream和ObjectInputStream进行对象数据传输
 					ObjectOutputStream out = new ObjectOutputStream(
 							mSocket.getOutputStream());

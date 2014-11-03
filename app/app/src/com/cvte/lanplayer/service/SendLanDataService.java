@@ -36,7 +36,7 @@ public class SendLanDataService extends Service {
 		// 注册扫描控制的接收器
 		mScanCtrl = new ScanCtrlReceiver();
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(GlobalData.CTRL_SCAN_ACTION);
+		filter.addAction(GlobalData.LANScanCtrl.CTRL_LAN_SCAN_ACTION);
 		registerReceiver(mScanCtrl, filter);
 	}
 
@@ -47,10 +47,10 @@ public class SendLanDataService extends Service {
 			// TODO Auto-generated method stub
 
 			Bundle bundle = intent.getExtras();
-			int control = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
+			int control = bundle.getInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT);
 
 			switch (control) {
-			case GlobalData.STARE_SCAN:// 开始扫描
+			case GlobalData.LANScanCtrl.STARE_SCAN:// 开始扫描
 				Log.d(TAG, "recv StartScanLAN Broadcast ");
 
 				// 调用工具类的扫描方法
@@ -58,7 +58,7 @@ public class SendLanDataService extends Service {
 						.StartScan();
 				break;
 
-			case GlobalData.STOP_SCAN:// 停止扫描
+			case GlobalData.LANScanCtrl.STOP_SCAN:// 停止扫描
 
 				Log.d(TAG, "recv StopScanLAN Broadcast ");
 				// 调用工具类的停止扫描方法

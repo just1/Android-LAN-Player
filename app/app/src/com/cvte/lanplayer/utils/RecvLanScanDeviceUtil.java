@@ -8,10 +8,13 @@ import java.net.SocketException;
 
 import android.app.Service;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
+import com.cvte.lanplayer.entity.SocketTranEntity;
 
 /**
  * 接收其他设备在局域网扫描时候的响应
@@ -33,7 +36,7 @@ public class RecvLanScanDeviceUtil {
 	private static Service mService;
 	private static RecvLanScanDeviceUtil instance = null;
 
-	private Socket socket = null;
+	// private Socket socket = null;
 	private DatagramSocket udpSocket = null;
 	private DatagramPacket udpPacket = null;
 
@@ -63,17 +66,17 @@ public class RecvLanScanDeviceUtil {
 		return instance;
 	}
 
-	private void SendMessage(String str) {
-		Intent intent = new Intent();
-
-		Bundle data = new Bundle();
-		data.putString(GlobalData.RECV_SCAN, str);
-
-		intent.putExtras(data);
-		intent.setAction(GlobalData.IS_SCANED_ACTION);// action与接收器相同
-
-		mService.sendBroadcast(intent);
-	}
+	// private void SendMessage(String str) {
+	// Intent intent = new Intent();
+	//
+	// Bundle data = new Bundle();
+	// data.putString(GlobalData.RECV_SCAN, str);
+	//
+	// intent.putExtras(data);
+	// intent.setAction(GlobalData.IS_SCANED_ACTION);// action与接收器相同
+	//
+	// mService.sendBroadcast(intent);
+	// }
 
 	/**
 	 * 开始接收数据
@@ -119,7 +122,8 @@ public class RecvLanScanDeviceUtil {
 
 					byte[] data = new byte[256];
 					try {
-						udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
+						udpSocket = new DatagramSocket(
+								GlobalData.TranPort.UDP_PORT);
 						udpPacket = new DatagramPacket(data, data.length);
 					} catch (SocketException e1) {
 						e1.printStackTrace();
@@ -139,32 +143,35 @@ public class RecvLanScanDeviceUtil {
 							Log.d(TAG, "收到IP地址：" + quest_ip + "的UDP请求\n"
 									+ "地址代码：" + codeString);
 
-							SendMessage("收到IP地址：" + quest_ip + "的UDP请求\n"
-									+ "地址代码：" + codeString + "\n\n");
+							// SendMessage("收到IP地址：" + quest_ip + "的UDP请求\n"
+							// + "地址代码：" + codeString + "\n\n");
 
-							try {
-								final String ip = udpPacket.getAddress()
-										.toString().substring(1);
+							final String ip = udpPacket.getAddress().toString()
+									.substring(1);
 
-								SendMessage("建立socket通信：" + ip + "\n");
+							// SendMessage("建立socket通信：" + ip + "\n");
+							// Log.d(TAG, "建立socket通信：" + ip + "\n");
 
-								socket = new Socket(ip, GlobalData.SOCKET_PORT);
-								/*
-								 * 以后这里可以加入socket的秘钥
-								 */
+							// 发送通信密钥
+							// socket = new Socket(ip,
+							// GlobalData.TranPort.SOCKET_TRANSMIT_PORT);
 
-							} catch (IOException e) {
-								e.printStackTrace();
-							} finally {
-								try {
-									if (null != socket) {
-										socket.close();
-									}
-								} catch (IOException e) {
-									// TODO Auto-generated catch block
-									e.printStackTrace();
-								}
-							}
+							// 实例化传输对象
+							SocketTranEntity msg = new SocketTranEntity();
+							msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_LAN_ASK);
+							// 设置发送方IP地址
+							msg.setmSendIP(getIpAddress());
+							// 设置接收方IP
+							msg.setmRecvIP(ip);
+
+							// 加入通信密钥
+							// msg.setmMessage(et_context.getText().toString());
+
+							// 直接发送消息
+							SendSocketMessageUtil.getInstance(mService)
+									.SendMessage(msg, ip);
+
+							Log.d(TAG, "向IP：" + ip + "发送确认数据包");
 						}
 					}
 
@@ -203,9 +210,9 @@ public class RecvLanScanDeviceUtil {
 		// 这样直接赋值为null不知道好不好
 		mRecvThread = null;
 
-		if (socket != null) {
-			socket.close();
-		}
+		// if (socket != null) {
+		// socket.close();
+		// }
 
 		if (udpSocket != null) {
 			udpSocket.close();
@@ -215,4 +222,29 @@ public class RecvLanScanDeviceUtil {
 		}
 
 	}
+
+	/**
+	 * 发送LAN扫描确认包
+	 */
+	private void SendLanAskPackbag(String targetIP) {
+
+	}
+
+	/**
+	 * 获取本机的IP地址
+	 */
+	private String getIpAddress() {
+		WifiManager wifiManager = (WifiManager) mService
+				.getSystemService(mService.WIFI_SERVICE);
+
+		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+		int ipAddress = wifiInfo.getIpAddress();
+		// Log.d("TAG","IP:"+ String.valueOf(ipAddress));
+
+		return ((ipAddress & 0xff) + "." + (ipAddress >> 8 & 0xff) + "."
+				+ (ipAddress >> 16 & 0xff) + "." + (ipAddress >> 24 & 0xff));
+
+	}
+
 }

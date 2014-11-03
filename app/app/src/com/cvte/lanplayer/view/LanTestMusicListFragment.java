@@ -64,7 +64,7 @@ public class LanTestMusicListFragment extends Fragment {
 		// 注册接收器
 		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(GlobalData.RECV_SOCKET_FROM_SERVICE_ACTION);
+		filter.addAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);
 		mActivity.registerReceiver(mRecvScoketMsgReceiver, filter);
 
 		return view;
@@ -81,14 +81,14 @@ public class LanTestMusicListFragment extends Fragment {
 			Bundle bundle = intent.getExtras();
 
 			// 获取指令
-			int commant = bundle.getInt(GlobalData.GET_BUNDLE_COMMANT);
+			int commant = bundle.getInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT);
 
 			// 假如是发送音乐列表
-			if (commant == GlobalData.COMMAND_SEND_MUSIC_LIST) {
+			if (commant == GlobalData.SocketTranCommand.COMMAND_SEND_MUSIC_LIST) {
 				Log.d(TAG, "RECV:COMMAND_SEND_MUSIC_LIST");
 
 				SocketTranEntity data = (SocketTranEntity) bundle
-						.getSerializable(GlobalData.GET_BUNDLE_DATA);
+						.getSerializable(GlobalData.SocketTranCommand.GET_BUNDLE_COMMON_DATA);
 
 				// 把收到的数据显示出来
 

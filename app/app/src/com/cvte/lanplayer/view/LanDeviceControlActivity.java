@@ -63,7 +63,7 @@ public class LanDeviceControlActivity extends Activity {
 
 				//实例化传输对象
 				SocketTranEntity msg = new SocketTranEntity();
-				msg.setmCommant(GlobalData.COMMAND_RECV_MSG);
+				msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_RECV_MSG);
 				msg.setmMessage("welcome to cvte ");
 				
 				// 直接发送消息
@@ -78,11 +78,11 @@ public class LanDeviceControlActivity extends Activity {
 		Intent intent = getIntent();
 		targetIp = (String) intent.getSerializableExtra("ip");
 
-		// 注册接收器
-		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);
-		this.registerReceiver(mRecvScoketMsgReceiver, filter);
+//		// 注册接收器
+//		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
+//		IntentFilter filter = new IntentFilter();
+//		filter.addAction(GlobalData.RECV_LAN_SOCKET_MSG_ACTION);
+//		this.registerReceiver(mRecvScoketMsgReceiver, filter);
 	}
 
 	// 获取扫描出来的IP地址的接收器
@@ -92,11 +92,11 @@ public class LanDeviceControlActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 
-			Bundle bundle = intent.getExtras();
-			String str = bundle.getString("str");
-
-			// 把收到的数据显示出来
-			tv_recv_msg.setText(str);
+//			Bundle bundle = intent.getExtras();
+//			String str = bundle.getString("str");
+//
+//			// 把收到的数据显示出来
+//			tv_recv_msg.setText(str);
 
 		}
 	}

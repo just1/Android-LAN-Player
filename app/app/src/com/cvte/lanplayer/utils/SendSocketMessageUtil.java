@@ -65,39 +65,30 @@ public class SendSocketMessageUtil {
 			@Override
 			public void run() {
 				super.run();
-				// 关闭输入流、socket
-				try {
 
-					// mSocket = new Socket(mTargetIP,
-					// GlobalData.SOCKET_TRANSMIT_PORT);
-					// OutputStream outputName = mSocket.getOutputStream();
-					// OutputStreamWriter outputWriter = new
-					// OutputStreamWriter(outputName);
-					// BufferedWriter bwName = new BufferedWriter(outputWriter);
-					// bwName.write(str);
-					// bwName.close();
-					// outputWriter.close();
-					// outputName.close();
-					// mSocket.close();
+				synchronized (GlobalData.TCP_SOCKET_LOCK) {
+					try {
 
-					// 连接到服务器端
-					mSocket = new Socket(mTargetIP,
-							GlobalData.SOCKET_TRANSMIT_PORT);
-					// 使用ObjectOutputStream和ObjectInputStream进行对象数据传输
-					ObjectOutputStream out = new ObjectOutputStream(
-							mSocket.getOutputStream());
-					ObjectInputStream in = new ObjectInputStream(
-							mSocket.getInputStream());
-					// 将客户端的对象数据流输出到服务器端去
-					out.writeObject(data);
-					out.flush();
+						// 连接到服务器端
+						mSocket = new Socket(mTargetIP,
+								GlobalData.TranPort.SOCKET_TRANSMIT_PORT);
+						// 使用ObjectOutputStream和ObjectInputStream进行对象数据传输
+						ObjectOutputStream out = new ObjectOutputStream(
+								mSocket.getOutputStream());
+						ObjectInputStream in = new ObjectInputStream(
+								mSocket.getInputStream());
+						// 将客户端的对象数据流输出到服务器端去
+						out.writeObject(data);
+						out.flush();
 
-					out.close();
-					in.close();
-					mSocket.close();
+						out.close();
+						in.close();
+						mSocket.close();
 
-				} catch (IOException e) {
-					e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+
 				}
 
 			}

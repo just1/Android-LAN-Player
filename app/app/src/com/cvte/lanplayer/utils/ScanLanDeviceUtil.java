@@ -1,8 +1,6 @@
 package com.cvte.lanplayer.utils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -19,6 +17,13 @@ import android.util.Log;
 
 import com.cvte.lanplayer.GlobalData;
 
+/**
+ * 发起局域网UDP扫描
+ * 
+ * 
+ * @author JHYin
+ * 
+ */
 public class ScanLanDeviceUtil {
 
 	private static String TAG = "ScanLanDeviceUtil";
@@ -26,14 +31,14 @@ public class ScanLanDeviceUtil {
 	private static ScanLanDeviceUtil instance = null;
 
 	// 扫描和接收返回指令的线程
-	private static TcpReceiveThread mTCPThread;
+	// private static TcpReceiveThread mTCPThread;
 
 	private DatagramSocket udpSocket;
-	private Socket socket = null;
-	private ServerSocket ss = null;
+//	private Socket socket = null;
+//	private ServerSocket ss = null;
 
-	private boolean isTCPThreadStart = false;
-	private boolean isBroadCastUdpThreadStart = false;
+//	private boolean isTCPThreadStart = false;
+//	private boolean isBroadCastUdpThreadStart = false;
 
 	private static final int MAX_DATA_PACKET_LENGTH = 40;
 	private byte[] buffer = new byte[MAX_DATA_PACKET_LENGTH];
@@ -43,7 +48,7 @@ public class ScanLanDeviceUtil {
 	 */
 	private ScanLanDeviceUtil() {
 
-		mTCPThread = new TcpReceiveThread();
+		// mTCPThread = new TcpReceiveThread();
 	}
 
 	/**
@@ -65,23 +70,23 @@ public class ScanLanDeviceUtil {
 	 * @throws IOException
 	 */
 	public void StopScan() throws IOException {
-		if (mTCPThread != null) {
-			Log.d(TAG, "interrupt mTCPThread");
-
-			mTCPThread.interrupt();
-		}
+		// if (mTCPThread != null) {
+		// Log.d(TAG, "interrupt mTCPThread");
+		//
+		// mTCPThread.interrupt();
+		// }
 
 		if (udpSocket != null) {
 			udpSocket.close();
 		}
 
-		if (socket != null) {
-			socket.close();
-		}
-
-		if (ss != null) {
-			ss.close();
-		}
+//		if (socket != null) {
+//			socket.close();
+//		}
+//
+//		if (ss != null) {
+//			ss.close();
+//		}
 
 	}
 
@@ -98,10 +103,10 @@ public class ScanLanDeviceUtil {
 		new BroadCastUdpThread(getLocalIPAddress().toString()).start();
 
 		// 接收TCP回传消息的线程，一直开启，不会被关
-		if (mTCPThread.getState() == Thread.State.NEW) {
-
-			mTCPThread.start();
-		}
+		// if (mTCPThread.getState() == Thread.State.NEW) {
+		//
+		// mTCPThread.start();
+		// }
 
 	}
 
@@ -129,13 +134,13 @@ public class ScanLanDeviceUtil {
 	 * 
 	 * @param str
 	 */
-	private void SendMessage(String str) {
-		Intent intent = new Intent();
-		intent.putExtra("str", str);
-		intent.setAction(GlobalData.GET_SCAN_DATA_ACTION);// action与接收器相同
-
-		mService.sendBroadcast(intent);
-	}
+	// private void SendMessage(String str) {
+	// Intent intent = new Intent();
+	// intent.putExtra("str", str);
+	// intent.setAction(GlobalData.GET_SCAN_DATA_ACTION);// action与接收器相同
+	//
+	// mService.sendBroadcast(intent);
+	// }
 
 	/**
 	 * 
@@ -155,8 +160,7 @@ public class ScanLanDeviceUtil {
 		public void run() {
 
 			/*
-			 * 关闭接收端口扫描
-			 * 必须放在synchronized()同步代码块之前，否则无法获得锁
+			 * 关闭接收端口扫描 必须放在synchronized()同步代码块之前，否则无法获得锁
 			 */
 			StopLANRecv();
 
@@ -169,14 +173,14 @@ public class ScanLanDeviceUtil {
 			synchronized (GlobalData.UDP_SOCKET_LOCK) {
 				DatagramPacket dataPacket = null;
 				try {
-					udpSocket = new DatagramSocket(GlobalData.UDP_PORT);
+					udpSocket = new DatagramSocket(GlobalData.TranPort.UDP_PORT);
 
 					dataPacket = new DatagramPacket(buffer,
 							MAX_DATA_PACKET_LENGTH);
 					byte[] data = dataString.getBytes();
 					dataPacket.setData(data);
 					dataPacket.setLength(data.length);
-					dataPacket.setPort(GlobalData.UDP_PORT);
+					dataPacket.setPort(GlobalData.TranPort.UDP_PORT);
 
 					InetAddress broadcastAddr;
 
@@ -218,10 +222,11 @@ public class ScanLanDeviceUtil {
 		Intent intent = new Intent();
 
 		Bundle data = new Bundle();
-		data.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.STARE_LAN_RECV);
+		data.putInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
+				GlobalData.LANScanCtrl.STARE_LAN_RECV);
 
 		intent.putExtras(data);
-		intent.setAction(GlobalData.CTRL_RECV_ACTION);// action与接收器相同
+		intent.setAction(GlobalData.LANScanCtrl.CTRL_LAN_RECV_ACTION);// action与接收器相同
 
 		mService.sendBroadcast(intent);
 	}
@@ -233,62 +238,63 @@ public class ScanLanDeviceUtil {
 		Intent intent = new Intent();
 
 		Bundle data = new Bundle();
-		data.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.STOP_LAN_RECV);
+		data.putInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
+				GlobalData.LANScanCtrl.STOP_LAN_RECV);
 
 		intent.putExtras(data);
-		intent.setAction(GlobalData.CTRL_RECV_ACTION);// action与接收器相同
+		intent.setAction(GlobalData.LANScanCtrl.CTRL_LAN_RECV_ACTION);// action与接收器相同
 
 		mService.sendBroadcast(intent);
 	}
 
-	private class TcpReceiveThread extends Thread {
-		public void run() {
-
-			while (true) {
-
-				BufferedReader in = null;
-				try {
-					ss = new ServerSocket(GlobalData.SOCKET_PORT);
-
-					socket = ss.accept();
-
-					if (socket != null) {
-
-						in = new BufferedReader(new InputStreamReader(
-								socket.getInputStream()));
-
-						StringBuilder sb = new StringBuilder();
-						sb.append(socket.getInetAddress().getHostAddress());
-						String line = null;
-						while ((line = in.readLine()) != null) {
-							sb.append(line);
-						}
-						Log.i("TcpReceive", "connect :" + sb.toString());
-
-						final String ipString = sb.toString().trim();// "192.168.0.104:8731";
-
-						SendMessage(ipString);
-					}
-
-				} catch (IOException e) {
-					e.printStackTrace();
-				} finally {
-					try {
-						if (in != null)
-							in.close();
-						if (socket != null)
-							socket.close();
-						if (ss != null)
-							ss.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-
-			}
-			// isTCPThreadStart = false;
-
-		}
-	}
+	// private class TcpReceiveThread extends Thread {
+	// public void run() {
+	//
+	// while (true) {
+	//
+	// BufferedReader in = null;
+	// try {
+	// ss = new ServerSocket(GlobalData.TranPort.SOCKET_PORT);
+	//
+	// socket = ss.accept();
+	//
+	// if (socket != null) {
+	//
+	// in = new BufferedReader(new InputStreamReader(
+	// socket.getInputStream()));
+	//
+	// StringBuilder sb = new StringBuilder();
+	// sb.append(socket.getInetAddress().getHostAddress());
+	// String line = null;
+	// while ((line = in.readLine()) != null) {
+	// sb.append(line);
+	// }
+	// Log.i("TcpReceive", "connect :" + sb.toString());
+	//
+	// final String ipString = sb.toString().trim();// "192.168.0.104:8731";
+	//
+	// SendMessage(ipString);
+	// }
+	//
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// } finally {
+	// try {
+	// if (in != null)
+	// in.close();
+	// if (socket != null)
+	// socket.close();
+	// if (ss != null)
+	// ss.close();
+	// } catch (IOException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	//
+	// }
+	// // isTCPThreadStart = false;
+	//
+	// }
+	// }
 
 }

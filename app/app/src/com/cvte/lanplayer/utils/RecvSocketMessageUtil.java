@@ -91,7 +91,7 @@ public class RecvSocketMessageUtil {
 
 				try {
 					mServerSocket = new ServerSocket(
-							GlobalData.SOCKET_TRANSMIT_PORT);
+							GlobalData.TranPort.SOCKET_TRANSMIT_PORT);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

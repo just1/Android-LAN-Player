@@ -97,7 +97,7 @@ public class ScanLanDeviceFragment extends Fragment {
 		// 注册接收器
 		mScanDataReceiver = new ScanDataReceiver();
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(GlobalData.GET_SCAN_DATA_ACTION);
+		filter.addAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);
 		activity.registerReceiver(mScanDataReceiver, filter);
 
 		mLocalIp = getIpAddress();
@@ -110,30 +110,18 @@ public class ScanLanDeviceFragment extends Fragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// ScanLanDevice();
-
-				// // 关闭接收的服务
-				// activity.stopService(new Intent(activity,
-				// RecvLanDataService.class));
-				//
-				// // 启动扫描，开始服务
-				// activity.startService(new Intent(activity,
-				// SendLanDataService.class));
+				Log.d(TAG, "on click scan button");
 
 				Intent intent = new Intent();
-				// intent.putExtra(GlobalData.GET_BUNDLE_COMMANT,
-				// GlobalData.STARE_SCAN);
 
 				Bundle data = new Bundle();
-				data.putInt(GlobalData.GET_BUNDLE_COMMANT,
-						GlobalData.STARE_SCAN);
+				data.putInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
+						GlobalData.LANScanCtrl.STARE_SCAN);
 
 				intent.putExtras(data);
 
-				intent.setAction(GlobalData.CTRL_SCAN_ACTION);// action与接收器相同
+				intent.setAction(GlobalData.LANScanCtrl.CTRL_LAN_SCAN_ACTION);// action与接收器相同
 				activity.sendBroadcast(intent);
-
-				Log.d(TAG, "on click scan button");
 
 			}
 		});
@@ -141,26 +129,20 @@ public class ScanLanDeviceFragment extends Fragment {
 		btn_scan_stop.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				// activity.stopService(new Intent(activity,
-				// SendLanDataService.class));
-				//
-				// activity.startService(new Intent(activity,
-				// RecvLanDataService.class));
+
+				Log.d(TAG, "on click canel scan button");
 
 				Intent intent = new Intent();
 
-				// intent.putExtra(GlobalData.GET_BUNDLE_COMMANT,
-				// GlobalData.STOP_SCAN);
-
 				Bundle data = new Bundle();
-				data.putInt(GlobalData.GET_BUNDLE_COMMANT, GlobalData.STOP_SCAN);
+				data.putInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
+						GlobalData.LANScanCtrl.STOP_SCAN);
 
 				intent.putExtras(data);
 
-				intent.setAction(GlobalData.CTRL_SCAN_ACTION);// action与接收器相同
+				intent.setAction(GlobalData.LANScanCtrl.CTRL_LAN_SCAN_ACTION);// action与接收器相同
 				activity.sendBroadcast(intent);
 
-				Log.d(TAG, "on click canel scan button");
 			}
 		});
 
@@ -206,19 +188,29 @@ public class ScanLanDeviceFragment extends Fragment {
 		public void onReceive(Context context, Intent intent) {
 
 			Bundle bundle = intent.getExtras();
-			String str = bundle.getString("str");
 
-			// 如果已经有了，就不添加
-			for (int i = 0; i < mIpList.size(); i++) {
-				if (str.equals(mIpList.get(i))) {
-					return;
+			// 获取指令
+			int commant = bundle
+					.getInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT);
+
+			// 根据指令来进行处理
+			if (commant == GlobalData.SocketTranCommand.COMMAND_LAN_ASK) {
+				String str = bundle
+						.getString(GlobalData.SocketTranCommand.GET_BUNDLE_COMMON_DATA);
+
+				// 如果已经有了，就不添加
+				for (int i = 0; i < mIpList.size(); i++) {
+					if (str.equals(mIpList.get(i))) {
+						return;
+					}
 				}
+
+				mIpList.add(str);
+				// 更新数据
+				mIpList_adapter.notifyDataSetChanged();
+				// 处理接收到的内容........
 			}
 
-			mIpList.add(str);
-			// 更新数据
-			mIpList_adapter.notifyDataSetChanged();
-			// 处理接收到的内容
 		}
 
 	}
