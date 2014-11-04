@@ -22,14 +22,12 @@ public class GlobalData {
 		 * Socket通信的端口
 		 */
 		public static final int SOCKET_TRANSMIT_PORT = 38281;
-		
-		
+
 		/*
 		 * Socket文件传输端口
 		 */
 		public static final int SOCKET_FILE_TRANSMIT_PORT = 38381;
-		
-		
+
 	}
 
 	public class LANScanCtrl {
@@ -78,6 +76,11 @@ public class GlobalData {
 		 * 收到LAN扫描的确认包
 		 */
 		public static final int COMMAND_LAN_ASK = 4;
+
+		/*
+		 * 请求获取某个音乐文件
+		 */
+		public static final int COMMAND_REQUSET_MUSIC_FILE = 5;
 
 		/*
 		 * 请求获取接收器的Bundle的指令

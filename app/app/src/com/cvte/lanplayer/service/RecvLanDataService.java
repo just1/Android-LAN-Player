@@ -17,6 +17,7 @@ import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.RecvLanScanDeviceUtil;
 import com.cvte.lanplayer.utils.RecvSocketFileUtil;
 import com.cvte.lanplayer.utils.RecvSocketMessageUtil;
+import com.cvte.lanplayer.utils.SendSocketFileUtil;
 import com.cvte.lanplayer.utils.SendSocketMessageUtil;
 
 public class RecvLanDataService extends Service {
@@ -46,9 +47,8 @@ public class RecvLanDataService extends Service {
 		// 启动被其他局域网设备扫描到的接收监听
 		RecvLanScanDeviceUtil.getInstance(this).StartRecv();
 		RecvSocketMessageUtil.getInstance(this).StartRecv();
-		
-		
-		//启动文件接收监听
+
+		// 启动文件接收监听
 		RecvSocketFileUtil.getInstance(this).StartRecv();
 
 	}
@@ -76,15 +76,15 @@ public class RecvLanDataService extends Service {
 		}
 
 	}
-	
+
 	/**
 	 * 从Util里面接收到文件传入
+	 * 
 	 * @param fileName
 	 */
-	public void RecvFileFromUtil(String fileName){
-		
+	public void RecvFileFromUtil(String fileName) {
+
 	}
-	
 
 	/**
 	 * 放在RecvSocketMessageUtil里面回调，处理socket传入的消息
@@ -138,7 +138,6 @@ public class RecvLanDataService extends Service {
 			}
 
 			// 发送本机的音乐列表
-
 			// 封装一个对象实例,把音乐列表传过来
 			SocketTranEntity musicList = new SocketTranEntity();
 
@@ -147,14 +146,12 @@ public class RecvLanDataService extends Service {
 			musicList.setmMusicList(AppConstant.MusicPlayData.myMusicList);
 
 			// 发送音乐列表
-			// SendLocalMusicListUtil.getInstance(RecvLanDataService.this).SendMusicList(musicList,
-			// targetIP);
 			SendSocketMessageUtil.getInstance(RecvLanDataService.this)
 					.SendMessage(musicList, targetIP);
 
 			break;
 
-		// 收到音乐列表
+		// 收到回传的音乐列表
 		case GlobalData.SocketTranCommand.COMMAND_SEND_MUSIC_LIST:
 			Log.d(TAG, "收到数据包：COMMAND_SEND_MUSIC_LIST");
 			// 暂时在这里输出音乐列表
@@ -204,6 +201,22 @@ public class RecvLanDataService extends Service {
 
 			sendBroadcast(lan_ask_intent);
 
+			break;
+
+		//收到获取音乐文件请求
+		case GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_FILE:
+			Log.d(TAG, "收到数据包：COMMAND_REQUSET_MUSIC_FILE");
+			
+			//获取需要发送的音乐ID号
+			int musicID = Integer.parseInt(data.getmMessage());
+			
+			//发送音乐文件
+			SendSocketFileUtil.getInstance().SendFile(
+					AppConstant.MusicPlayData.myMusicList.get(musicID)
+							.getFileName(),
+					AppConstant.MusicPlayData.myMusicList.get(musicID)
+							.getFilePath(), data.getmSendIP());
+			
 			break;
 
 		}

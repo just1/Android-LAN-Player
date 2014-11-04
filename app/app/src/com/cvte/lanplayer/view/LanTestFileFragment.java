@@ -11,6 +11,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -124,8 +126,7 @@ public class LanTestFileFragment extends Fragment {
 	 */
 	private void ShowRequsetDialog(final int musicID) {
 
-		String musicName = AppConstant.MusicPlayData.myMusicList.get(musicID)
-				.getFileName();
+		String musicName = mMusicList.get(musicID);
 
 		AlertDialog.Builder builder = new Builder(mActivity);
 
@@ -140,12 +141,25 @@ public class LanTestFileFragment extends Fragment {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 
+				Log.d(TAG, "on click:请求获取音乐：" + String.valueOf(musicID));
+
+				// 请求获取目标IP的相应的音乐文件
+				// 实例化传输对象
+				SocketTranEntity msg = new SocketTranEntity();
+				msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_FILE);
+				// 以目标IP的音乐列表的编号作为标记
+				msg.setmMessage(String.valueOf(musicID));
+				msg.setmSendIP(getIpAddress());
+
+				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
+						et_ip.getText().toString());
+
 				// 发送文件
-				SendSocketFileUtil.getInstance().SendFile(
-						AppConstant.MusicPlayData.myMusicList.get(musicID)
-								.getFileName(),
-						AppConstant.MusicPlayData.myMusicList.get(musicID)
-								.getFilePath(), et_ip.getText().toString());
+				// SendSocketFileUtil.getInstance().SendFile(
+				// AppConstant.MusicPlayData.myMusicList.get(musicID)
+				// .getFileName(),
+				// AppConstant.MusicPlayData.myMusicList.get(musicID)
+				// .getFilePath(), et_ip.getText().toString());
 
 			}
 		});
@@ -160,6 +174,26 @@ public class LanTestFileFragment extends Fragment {
 		});
 
 		builder.show();
+
+	}
+
+	/**
+	 * 获取本机的IP地址
+	 * 
+	 * 以后重构把这里去掉
+	 * 
+	 */
+	private String getIpAddress() {
+		WifiManager wifiManager = (WifiManager) mActivity
+				.getSystemService(mActivity.WIFI_SERVICE);
+
+		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+
+		int ipAddress = wifiInfo.getIpAddress();
+		// Log.d("TAG","IP:"+ String.valueOf(ipAddress));
+
+		return ((ipAddress & 0xff) + "." + (ipAddress >> 8 & 0xff) + "."
+				+ (ipAddress >> 16 & 0xff) + "." + (ipAddress >> 24 & 0xff));
 
 	}
 

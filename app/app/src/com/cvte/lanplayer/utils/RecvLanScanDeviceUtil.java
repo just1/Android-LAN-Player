@@ -66,18 +66,6 @@ public class RecvLanScanDeviceUtil {
 		return instance;
 	}
 
-	// private void SendMessage(String str) {
-	// Intent intent = new Intent();
-	//
-	// Bundle data = new Bundle();
-	// data.putString(GlobalData.RECV_SCAN, str);
-	//
-	// intent.putExtras(data);
-	// intent.setAction(GlobalData.IS_SCANED_ACTION);// action与接收器相同
-	//
-	// mService.sendBroadcast(intent);
-	// }
-
 	/**
 	 * 开始接收数据
 	 */
