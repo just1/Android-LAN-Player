@@ -131,7 +131,7 @@ public class LanTestFileFragment extends Fragment {
 		mSelectMusicID = MusicID;
 
 		AlertDialog.Builder builder = new Builder(mActivity);
- 
+
 		// 设置标题
 		builder.setTitle("获取音乐");
 		// 设置描述信息
@@ -180,7 +180,7 @@ public class LanTestFileFragment extends Fragment {
 
 			}
 		});
-		
+
 		// 取消
 		builder.setPositiveButton("取消", new DialogInterface.OnClickListener() {
 

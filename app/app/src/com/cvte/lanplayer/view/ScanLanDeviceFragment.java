@@ -1,5 +1,6 @@
 package com.cvte.lanplayer.view;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +27,7 @@ import android.widget.TextView;
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.adapter.MyListAdapter;
-import com.cvte.lanplayer.service.RecvLanDataService;
-import com.cvte.lanplayer.service.SendLanDataService;
+import com.cvte.lanplayer.utils.ScanLanDeviceUtil;
 
 public class ScanLanDeviceFragment extends Fragment {
 
@@ -40,7 +40,7 @@ public class ScanLanDeviceFragment extends Fragment {
 
 	// 扫描出来的IP列表
 	private List<String> mIpList = new ArrayList<String>();
-	private Activity activity;
+	private Activity mActivity;
 
 	// 控件
 	private TextView tv_local_ip;
@@ -55,7 +55,7 @@ public class ScanLanDeviceFragment extends Fragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		this.activity = activity;
+		this.mActivity = activity;
 	}
 
 	@Override
@@ -91,14 +91,14 @@ public class ScanLanDeviceFragment extends Fragment {
 	 * 初始化其他配置
 	 */
 	private void Init() {
-		mIpList_adapter = new MyListAdapter(mIpList, activity);
+		mIpList_adapter = new MyListAdapter(mIpList, mActivity);
 		lv_iplist.setAdapter(mIpList_adapter);
 
 		// 注册接收器
 		mScanDataReceiver = new ScanDataReceiver();
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);
-		activity.registerReceiver(mScanDataReceiver, filter);
+		mActivity.registerReceiver(mScanDataReceiver, filter);
 
 		mLocalIp = getIpAddress();
 		tv_local_ip.setText("本机IP：" + String.valueOf(mLocalIp));
@@ -112,16 +112,8 @@ public class ScanLanDeviceFragment extends Fragment {
 			public void onClick(View arg0) {
 				Log.d(TAG, "on click scan button");
 
-				Intent intent = new Intent();
-
-				Bundle data = new Bundle();
-				data.putInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
-						GlobalData.LANScanCtrl.STARE_SCAN);
-
-				intent.putExtras(data);
-
-				intent.setAction(GlobalData.LANScanCtrl.CTRL_LAN_SCAN_ACTION);// action与接收器相同
-				activity.sendBroadcast(intent);
+				// 调用工具类的扫描方法
+				ScanLanDeviceUtil.getInstance(mActivity).StartScan();
 
 			}
 		});
@@ -132,17 +124,13 @@ public class ScanLanDeviceFragment extends Fragment {
 
 				Log.d(TAG, "on click canel scan button");
 
-				Intent intent = new Intent();
-
-				Bundle data = new Bundle();
-				data.putInt(GlobalData.SocketTranCommand.GET_BUNDLE_COMMANT,
-						GlobalData.LANScanCtrl.STOP_SCAN);
-
-				intent.putExtras(data);
-
-				intent.setAction(GlobalData.LANScanCtrl.CTRL_LAN_SCAN_ACTION);// action与接收器相同
-				activity.sendBroadcast(intent);
-
+				// 调用工具类的停止扫描方法
+				try {
+					ScanLanDeviceUtil.getInstance(mActivity).StopScan();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 
@@ -152,7 +140,7 @@ public class ScanLanDeviceFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				Intent startIntent = new Intent(activity,
+				Intent startIntent = new Intent(mActivity,
 						LanDeviceControlActivity.class);
 
 				startIntent.putExtra("ip", mIpList.get(position));
@@ -167,8 +155,8 @@ public class ScanLanDeviceFragment extends Fragment {
 	 * 获取本机的IP地址
 	 */
 	private String getIpAddress() {
-		WifiManager wifiManager = (WifiManager) activity
-				.getSystemService(activity.WIFI_SERVICE);
+		WifiManager wifiManager = (WifiManager) mActivity
+				.getSystemService(mActivity.WIFI_SERVICE);
 
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
@@ -224,6 +212,6 @@ public class ScanLanDeviceFragment extends Fragment {
 		// activity.stopService(new Intent(activity, SendLanDataService.class));
 
 		// 解除注册接收器
-		activity.unregisterReceiver(mScanDataReceiver);
+		mActivity.unregisterReceiver(mScanDataReceiver);
 	}
 }

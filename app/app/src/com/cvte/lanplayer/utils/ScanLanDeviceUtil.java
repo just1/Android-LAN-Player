@@ -5,12 +5,10 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.net.SocketException;
 import java.util.Enumeration;
 
-import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,18 +25,11 @@ import com.cvte.lanplayer.GlobalData;
 public class ScanLanDeviceUtil {
 
 	private static String TAG = "ScanLanDeviceUtil";
-	private static Service mService;
+	private static Context mContext;
 	private static ScanLanDeviceUtil instance = null;
 
-	// 扫描和接收返回指令的线程
-	// private static TcpReceiveThread mTCPThread;
 
 	private DatagramSocket udpSocket;
-//	private Socket socket = null;
-//	private ServerSocket ss = null;
-
-//	private boolean isTCPThreadStart = false;
-//	private boolean isBroadCastUdpThreadStart = false;
 
 	private static final int MAX_DATA_PACKET_LENGTH = 40;
 	private byte[] buffer = new byte[MAX_DATA_PACKET_LENGTH];
@@ -47,16 +38,14 @@ public class ScanLanDeviceUtil {
 	 * 私有默认构造子
 	 */
 	private ScanLanDeviceUtil() {
-
-		// mTCPThread = new TcpReceiveThread();
 	}
 
 	/**
 	 * 静态工厂方法
 	 */
-	public static synchronized ScanLanDeviceUtil getInstance(Service service) {
+	public static synchronized ScanLanDeviceUtil getInstance(Context context) {
 
-		mService = service;
+		mContext = context;
 		if (instance == null) {
 			instance = new ScanLanDeviceUtil();
 		}
@@ -70,23 +59,10 @@ public class ScanLanDeviceUtil {
 	 * @throws IOException
 	 */
 	public void StopScan() throws IOException {
-		// if (mTCPThread != null) {
-		// Log.d(TAG, "interrupt mTCPThread");
-		//
-		// mTCPThread.interrupt();
-		// }
 
 		if (udpSocket != null) {
 			udpSocket.close();
 		}
-
-//		if (socket != null) {
-//			socket.close();
-//		}
-//
-//		if (ss != null) {
-//			ss.close();
-//		}
 
 	}
 
@@ -101,12 +77,6 @@ public class ScanLanDeviceUtil {
 
 		// 每按下一次，就开启一个UDP线程进行扫描
 		new BroadCastUdpThread(getLocalIPAddress().toString()).start();
-
-		// 接收TCP回传消息的线程，一直开启，不会被关
-		// if (mTCPThread.getState() == Thread.State.NEW) {
-		//
-		// mTCPThread.start();
-		// }
 
 	}
 
@@ -128,19 +98,6 @@ public class ScanLanDeviceUtil {
 		}
 		return null;
 	}
-
-	/**
-	 * 找到相应的IP地址，则进行广播
-	 * 
-	 * @param str
-	 */
-	// private void SendMessage(String str) {
-	// Intent intent = new Intent();
-	// intent.putExtra("str", str);
-	// intent.setAction(GlobalData.GET_SCAN_DATA_ACTION);// action与接收器相同
-	//
-	// mService.sendBroadcast(intent);
-	// }
 
 	/**
 	 * 
@@ -228,7 +185,7 @@ public class ScanLanDeviceUtil {
 		intent.putExtras(data);
 		intent.setAction(GlobalData.LANScanCtrl.CTRL_LAN_RECV_ACTION);// action与接收器相同
 
-		mService.sendBroadcast(intent);
+		mContext.sendBroadcast(intent);
 	}
 
 	/**
@@ -244,57 +201,7 @@ public class ScanLanDeviceUtil {
 		intent.putExtras(data);
 		intent.setAction(GlobalData.LANScanCtrl.CTRL_LAN_RECV_ACTION);// action与接收器相同
 
-		mService.sendBroadcast(intent);
+		mContext.sendBroadcast(intent);
 	}
-
-	// private class TcpReceiveThread extends Thread {
-	// public void run() {
-	//
-	// while (true) {
-	//
-	// BufferedReader in = null;
-	// try {
-	// ss = new ServerSocket(GlobalData.TranPort.SOCKET_PORT);
-	//
-	// socket = ss.accept();
-	//
-	// if (socket != null) {
-	//
-	// in = new BufferedReader(new InputStreamReader(
-	// socket.getInputStream()));
-	//
-	// StringBuilder sb = new StringBuilder();
-	// sb.append(socket.getInetAddress().getHostAddress());
-	// String line = null;
-	// while ((line = in.readLine()) != null) {
-	// sb.append(line);
-	// }
-	// Log.i("TcpReceive", "connect :" + sb.toString());
-	//
-	// final String ipString = sb.toString().trim();// "192.168.0.104:8731";
-	//
-	// SendMessage(ipString);
-	// }
-	//
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// } finally {
-	// try {
-	// if (in != null)
-	// in.close();
-	// if (socket != null)
-	// socket.close();
-	// if (ss != null)
-	// ss.close();
-	// } catch (IOException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	//
-	// }
-	// // isTCPThreadStart = false;
-	//
-	// }
-	// }
 
 }

@@ -33,24 +33,6 @@ public class GlobalData {
 	}
 
 	public class LANScanCtrl {
-		/**
-		 * 开始LAN扫描
-		 */
-
-		/*
-		 * 控制扫描启动或停止的接收器
-		 */
-		public static final String CTRL_LAN_SCAN_ACTION = "android.intent.action.ctrl_scan";
-
-		/*
-		 * 启动扫描
-		 */
-		public static final int STARE_SCAN = 1;
-
-		/*
-		 * 停止扫描
-		 */
-		public static final int STOP_SCAN = 2;
 
 		/**
 		 * 接收LAN扫描

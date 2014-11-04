@@ -1,8 +1,5 @@
 package com.cvte.lanplayer;
 
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +13,6 @@ import android.support.v4.view.ViewPager;
 import android.view.Window;
 
 import com.cvte.lanplayer.service.RecvLanDataService;
-import com.cvte.lanplayer.service.SendLanDataService;
 import com.cvte.lanplayer.view.LanTestFileFragment;
 import com.cvte.lanplayer.view.LanTestMsgFragment;
 import com.cvte.lanplayer.view.LanTestMusicListFragment;
@@ -26,7 +22,6 @@ import com.cvte.lanplayer.view.ScanLanDeviceFragment;
 public class MainActivity extends FragmentActivity {
 	private final String TAG = "MainActivity";
 
-
 	private MyFragmentPagerAdapter adapter;
 	private ViewPager vp;
 	// 标题数组
@@ -34,19 +29,13 @@ public class MainActivity extends FragmentActivity {
 	// fragment数组
 	List<Fragment> fragmentList = new ArrayList<Fragment>();
 
-
-	// udp等待连接
-	Socket socket = null;
-	static DatagramSocket udpSocket = null;
-	static DatagramPacket udpPacket = null;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		// 隐藏Title
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
+
 		setContentView(R.layout.activity_main);
 
 		vp = (ViewPager) findViewById(R.id.vp);
@@ -57,7 +46,7 @@ public class MainActivity extends FragmentActivity {
 		fragmentList.add(new LanTestMsgFragment());
 		fragmentList.add(new LanTestMusicListFragment());
 		fragmentList.add(new LanTestFileFragment());
-		
+
 		titleList.add("播放");
 		titleList.add("扫描");
 		titleList.add("测试消息通信");
@@ -68,9 +57,6 @@ public class MainActivity extends FragmentActivity {
 
 		// 开始接收信息的服务
 		startService(new Intent(MainActivity.this, RecvLanDataService.class));
-		
-		// 启动扫描，开始服务
-		startService(new Intent(MainActivity.this, SendLanDataService.class));
 
 	}
 
