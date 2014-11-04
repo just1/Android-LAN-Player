@@ -30,8 +30,8 @@ import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.adapter.MyListAdapter;
 import com.cvte.lanplayer.constant.AppConstant;
 import com.cvte.lanplayer.entity.SocketTranEntity;
+import com.cvte.lanplayer.utils.SendSocketFileUtil;
 import com.cvte.lanplayer.utils.SendSocketMessageUtil;
-import com.cvte.lanplayer.utils.SocketManager;
 
 public class LanTestFileFragment extends Fragment {
 
@@ -44,8 +44,6 @@ public class LanTestFileFragment extends Fragment {
 
 	private List<String> mMusicList = new ArrayList<String>();
 	private MyListAdapter mMusicListAdapter;
-	// 被选中的音乐文件ID
-	private int mSelectMusicID = -1;
 
 	private Activity mActivity;
 
@@ -124,11 +122,10 @@ public class LanTestFileFragment extends Fragment {
 	 * 弹出是否请求拉取对话框
 	 * 
 	 */
-	private void ShowRequsetDialog(int MusicID) {
+	private void ShowRequsetDialog(final int musicID) {
 
-		String musicName = AppConstant.MusicPlayData.myMusicList.get(MusicID)
+		String musicName = AppConstant.MusicPlayData.myMusicList.get(musicID)
 				.getFileName();
-		mSelectMusicID = MusicID;
 
 		AlertDialog.Builder builder = new Builder(mActivity);
 
@@ -143,40 +140,12 @@ public class LanTestFileFragment extends Fragment {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 
-				if (mSelectMusicID < 0)
-					return;
-
-				final ArrayList<String> fileName = new ArrayList<String>();
-				final ArrayList<String> safeFileName = new ArrayList<String>();
-
-				fileName.add(AppConstant.MusicPlayData.myMusicList.get(
-						mSelectMusicID).getFileName());
-				Log.d(TAG,
-						"send name: "
-								+ AppConstant.MusicPlayData.myMusicList.get(
-										mSelectMusicID).getFileName());
-
-				safeFileName.add(AppConstant.MusicPlayData.myMusicList.get(
-						mSelectMusicID).getFilePath());
-				Log.d(TAG,
-						"send path: "
-								+ AppConstant.MusicPlayData.myMusicList.get(
-										mSelectMusicID).getFilePath());
-
-				Thread sendThread = new Thread(new Runnable() {
-					@Override
-					public void run() {
-						Log.d(TAG, "start Thread to send");
-
-						SocketManager.getInstance().SendFile(fileName,
-								safeFileName, et_ip.getText().toString(),
-								GlobalData.TranPort.SOCKET_FILE_TRANSMIT_PORT);
-					}
-				});
-				sendThread.start();
-
-				// 还原回-1；
-				mSelectMusicID = -1;
+				// 发送文件
+				SendSocketFileUtil.getInstance().SendFile(
+						AppConstant.MusicPlayData.myMusicList.get(musicID)
+								.getFileName(),
+						AppConstant.MusicPlayData.myMusicList.get(musicID)
+								.getFilePath(), et_ip.getText().toString());
 
 			}
 		});

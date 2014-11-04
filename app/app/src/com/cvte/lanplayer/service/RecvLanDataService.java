@@ -15,9 +15,9 @@ import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.constant.AppConstant;
 import com.cvte.lanplayer.entity.SocketTranEntity;
 import com.cvte.lanplayer.utils.RecvLanScanDeviceUtil;
+import com.cvte.lanplayer.utils.RecvSocketFileUtil;
 import com.cvte.lanplayer.utils.RecvSocketMessageUtil;
 import com.cvte.lanplayer.utils.SendSocketMessageUtil;
-import com.cvte.lanplayer.utils.SocketManager;
 
 public class RecvLanDataService extends Service {
 
@@ -49,7 +49,7 @@ public class RecvLanDataService extends Service {
 		
 		
 		//启动文件接收监听
-		SocketManager.getInstance().StartRecv();
+		RecvSocketFileUtil.getInstance(this).StartRecv();
 
 	}
 
@@ -76,6 +76,15 @@ public class RecvLanDataService extends Service {
 		}
 
 	}
+	
+	/**
+	 * 从Util里面接收到文件传入
+	 * @param fileName
+	 */
+	public void RecvFileFromUtil(String fileName){
+		
+	}
+	
 
 	/**
 	 * 放在RecvSocketMessageUtil里面回调，处理socket传入的消息
