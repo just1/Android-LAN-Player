@@ -1,6 +1,7 @@
 package com.cvte.lanplayer.view;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -9,7 +10,9 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Audio.Media;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -40,6 +43,7 @@ public class LocalPlayerFragment extends Fragment implements
 
 	private Intent startIntent;
 	private ActivityReceive activityReceive;
+	private ScanSdReceiver scanSdReceiver;
 
 	private View myView;
 
@@ -69,7 +73,8 @@ public class LocalPlayerFragment extends Fragment implements
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.fragment_local_music, container, false);
+		View view = inflater.inflate(R.layout.fragment_local_music, container,
+				false);
 
 		mListView = (ListView) view.findViewById(R.id.music_list);
 		myView = view;
@@ -96,6 +101,20 @@ public class LocalPlayerFragment extends Fragment implements
 		// 启动后台Service
 		activity.startService(startIntent);
 
+		// 注册音乐列表扫描接收器
+		IntentFilter intentfilter = new IntentFilter(
+				Intent.ACTION_MEDIA_SCANNER_STARTED);
+
+		intentfilter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
+
+		// intentfilter.addAction(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+
+		intentfilter.addDataScheme("file");
+
+		scanSdReceiver = new ScanSdReceiver();
+		activity.registerReceiver(scanSdReceiver, intentfilter);
+
+		// 设置List触摸监听
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -251,11 +270,14 @@ public class LocalPlayerFragment extends Fragment implements
 	 * 获取音乐列表
 	 */
 	private void getMusicList() {
+
+		Log.d(TAG, "getMusicList");
+
 		// ArrayList<MusicData> list = null;
 		AppConstant.MusicPlayData.myMusicList.clear();
 		// 清除所有歌曲信息
 		Cursor cur = activity.getContentResolver().query(
-				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+				Media.EXTERNAL_CONTENT_URI,
 				new String[] { MediaStore.Audio.Media._ID,
 						MediaStore.Audio.Media.DISPLAY_NAME,
 						MediaStore.Audio.Media.TITLE,
@@ -387,6 +409,36 @@ public class LocalPlayerFragment extends Fragment implements
 	@Override
 	public void OnServiceConnectComplete() {
 		// TODO Auto-generated method stub
+	}
+
+	/**
+	 * 假如扫描单个文件或指定文件夹，可能由于小米系统的限制或者android 4.4的限制，导致无法收到系统扫描完成的广播
+	 * 
+	 * @author JHYin
+	 * 
+	 */
+	public class ScanSdReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+
+			String action = intent.getAction();
+
+			Log.d(TAG, "收到Android传入的消息");
+
+			if (Intent.ACTION_MEDIA_SCANNER_STARTED.equals(action)) {
+
+				Log.d(TAG, "Android 开始刷新播放列表");
+
+			} else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
+				Log.d(TAG, "Android 刷新播放列表完成");
+
+				getMusicList();
+				lvAdapter.notifyDataSetChanged();
+
+			}
+
+		}
 	}
 
 }

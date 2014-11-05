@@ -99,4 +99,19 @@ public class GlobalData {
 
 	}
 
+	/**
+	 * 其他配置参数
+	 * 
+	 * @author JHYin
+	 * 
+	 */
+	public class Other {
+		/*
+		 * 局域网发过来的音乐文件存储路径
+		 * 
+		 * 注意：加上“sdcard” 注意：windows和linux的下划线方式是不同的
+		 */
+		public static final String SAVE_LAN_FILE_DIR = "LanDownloads";
+	}
+
 }

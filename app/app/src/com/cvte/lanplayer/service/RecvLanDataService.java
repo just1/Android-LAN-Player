@@ -7,7 +7,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -83,6 +86,24 @@ public class RecvLanDataService extends Service {
 	 * @param fileName
 	 */
 	public void RecvFileFromUtil(String fileName) {
+
+		// 向android系统发起广播，扫描SD卡，更新音乐列表
+
+		/* 方法1：4.4不能用 */
+		// ScanSdCardToReflashMusicList();
+
+		/* 方法2 缺少扫描后广播通知 */
+		// String filePath = Environment.getExternalStorageDirectory().getPath()
+		// + '/' + GlobalData.Other.SAVE_LAN_FILE_DIR + "/" + fileName;
+		//
+		// scanFileAsync(filePath);
+
+		/* 方法3 */
+		MediaScannerConnection.scanFile(this, new String[] { Environment
+				.getExternalStorageDirectory().getPath()
+				+ '/'
+				+ GlobalData.Other.SAVE_LAN_FILE_DIR + "/" + fileName }, null,
+				null);
 
 	}
 
@@ -203,20 +224,20 @@ public class RecvLanDataService extends Service {
 
 			break;
 
-		//收到获取音乐文件请求
+		// 收到获取音乐文件请求
 		case GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_FILE:
 			Log.d(TAG, "收到数据包：COMMAND_REQUSET_MUSIC_FILE");
-			
-			//获取需要发送的音乐ID号
+
+			// 获取需要发送的音乐ID号
 			int musicID = Integer.parseInt(data.getmMessage());
-			
-			//发送音乐文件
+
+			// 发送音乐文件
 			SendSocketFileUtil.getInstance().SendFile(
 					AppConstant.MusicPlayData.myMusicList.get(musicID)
 							.getFileName(),
 					AppConstant.MusicPlayData.myMusicList.get(musicID)
 							.getFilePath(), data.getmSendIP());
-			
+
 			break;
 
 		}
@@ -256,6 +277,35 @@ public class RecvLanDataService extends Service {
 				break;
 			}
 		}
+	}
+
+	/**
+	 * 当文件接收成功，向android系统发送广播，通知其扫描应用音乐文件的下载目录
+	 */
+	private void ScanSdCardToReflashMusicList() {
+
+		Log.d(TAG, "向Android系统发起广播，请求扫描音乐列表");
+
+		// 只刷新指定目录，这样速度才快
+		// sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,
+		// Uri.parse("file://" + Environment.getExternalStorageDirectory()
+		// + "/" + GlobalData.Other.SAVE_LAN_FILE_DIR)));
+
+		sendBroadcast(new Intent(Intent.ACTION_MEDIA_MOUNTED,
+				Uri.parse("file://"
+						+ Environment.getExternalStorageDirectory().getPath()
+						+ '/' + GlobalData.Other.SAVE_LAN_FILE_DIR)));
+
+	}
+
+	public void scanFileAsync(String filePath) {
+		// Intent scanIntent = new
+		// Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+		// scanIntent.setData(Uri.fromFile(new File(filePath)));
+		// sendBroadcast(scanIntent);
+
+		Uri data = Uri.parse("file://" + filePath);
+		sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, data));
 	}
 
 }
