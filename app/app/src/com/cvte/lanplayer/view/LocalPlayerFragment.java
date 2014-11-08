@@ -1,7 +1,6 @@
 package com.cvte.lanplayer.view;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -106,8 +105,7 @@ public class LocalPlayerFragment extends Fragment implements
 				Intent.ACTION_MEDIA_SCANNER_STARTED);
 
 		intentfilter.addAction(Intent.ACTION_MEDIA_SCANNER_FINISHED);
-
-		// intentfilter.addAction(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+		intentfilter.addAction(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
 
 		intentfilter.addDataScheme("file");
 
@@ -412,7 +410,7 @@ public class LocalPlayerFragment extends Fragment implements
 	}
 
 	/**
-	 * 假如扫描单个文件或指定文件夹，可能由于小米系统的限制或者android 4.4的限制，导致无法收到系统扫描完成的广播
+	 * 假如扫描单个文件或指定文件夹，但可能由于小米系统的限制或者android 4.4的限制，导致无法收到系统扫描完成的广播
 	 * 
 	 * @author JHYin
 	 * 
@@ -426,15 +424,34 @@ public class LocalPlayerFragment extends Fragment implements
 
 			Log.d(TAG, "收到Android传入的消息");
 
+			// android系统扫描文件开始的广播
 			if (Intent.ACTION_MEDIA_SCANNER_STARTED.equals(action)) {
 
 				Log.d(TAG, "Android 开始刷新播放列表");
 
-			} else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
+			}
+			// android系统扫描文件完成的广播
+			else if (Intent.ACTION_MEDIA_SCANNER_FINISHED.equals(action)) {
 				Log.d(TAG, "Android 刷新播放列表完成");
 
 				getMusicList();
 				lvAdapter.notifyDataSetChanged();
+
+			}
+			// 接收自己发出扫描请求的广播
+			else if (Intent.ACTION_MEDIA_SCANNER_SCAN_FILE.equals(action)) {
+
+				Log.d(TAG, "收到本APP发出的ACTION_MEDIA_SCANNER_SCAN_FILE，即将刷新音乐列表");
+
+				// 由于发出扫描需要耗费时间，所以延时1000ms再进行音乐列表扫描
+				new Handler().postDelayed(new Runnable() {
+					public void run() {
+						// execute the task
+
+						getMusicList();
+						lvAdapter.notifyDataSetChanged();
+					}
+				}, 1000);
 
 			}
 

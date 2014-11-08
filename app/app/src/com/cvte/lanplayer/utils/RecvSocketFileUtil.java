@@ -8,10 +8,10 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Environment;
+import android.os.Looper;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.service.RecvLanDataService;
@@ -108,6 +108,8 @@ public class RecvSocketFileUtil {
 			name.close();
 			// SendMessage(0, "正在接收:" + fileName);
 			Log.d(TAG, "正在接收:" + fileName);
+			ShowToastMsgUtil.getInstance(mRkdService).ShowToastMsg(
+					"正在接收:" + fileName);
 
 			// 接收文件数据
 			Socket data = mServerSocket.accept();
@@ -130,7 +132,7 @@ public class RecvSocketFileUtil {
 				while ((size = dataStream.read(buffer)) != -1) {
 					file.write(buffer, 0, size);
 				}
-				
+
 				file.close();
 
 			}
@@ -139,17 +141,18 @@ public class RecvSocketFileUtil {
 			data.close();
 			// SendMessage(0, fileName + " 接收完成");
 			Log.d(TAG, fileName + " 接收完成");
+			ShowToastMsgUtil.getInstance(mRkdService).ShowToastMsg(
+					fileName + " 接收完成");
 
 			// 回调recvService的方法
 			mRkdService.RecvFileFromUtil(fileName);
-			
 
 			// String savePath = Environment.getExternalStorageDirectory()
 			// .getPath() + "/" + fileName;
 
 		} catch (Exception e) {
-			// SendMessage(0, "接收错误:\n" + e.getMessage());
 			Log.d(TAG, "接收错误:\n" + e.getMessage());
+			ShowToastMsgUtil.getInstance(mRkdService).ShowToastMsg("接收错误");
 		}
 	}
 
@@ -184,7 +187,5 @@ public class RecvSocketFileUtil {
 			destDir.mkdirs();
 		}
 	}
-
-
 
 }

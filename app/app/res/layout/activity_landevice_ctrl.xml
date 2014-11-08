@@ -22,7 +22,7 @@
         android:id="@+id/btn_send_msg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="send"
+        android:text="获取目标音乐列表"
         android:textSize="18sp" />
 
     <ListView

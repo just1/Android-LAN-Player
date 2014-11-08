@@ -56,6 +56,7 @@ public class LanDeviceControlActivity extends Activity {
 
 		InitData();
 		InitView();
+		SetListener();
 
 	}
 
@@ -65,6 +66,9 @@ public class LanDeviceControlActivity extends Activity {
 		return super.onCreateView(name, context, attrs);
 	}
 
+	/**
+	 * 实例化控件
+	 */
 	private void InitView() {
 
 		tv_target_ip = (TextView) findViewById(R.id.tv_target_ip);
@@ -73,6 +77,27 @@ public class LanDeviceControlActivity extends Activity {
 
 		tv_target_ip.setText("目标IP：" + targetIp);
 
+	}
+
+	/**
+	 * 初始化数据
+	 */
+	private void InitData() {
+		Intent intent = getIntent();
+		targetIp = (String) intent.getSerializableExtra("ip");
+
+		// 注册接收器
+		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);
+		registerReceiver(mRecvScoketMsgReceiver, filter);
+	}
+
+	/**
+	 * 设置监听
+	 */
+	private void SetListener() {
+		// TODO Auto-generated method stub
 		btn_send_msg.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -106,17 +131,6 @@ public class LanDeviceControlActivity extends Activity {
 				ShowRequsetDialog(position);
 			}
 		});
-	}
-
-	private void InitData() {
-		Intent intent = getIntent();
-		targetIp = (String) intent.getSerializableExtra("ip");
-
-		// 注册接收器
-		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);
-		registerReceiver(mRecvScoketMsgReceiver, filter);
 	}
 
 	@Override

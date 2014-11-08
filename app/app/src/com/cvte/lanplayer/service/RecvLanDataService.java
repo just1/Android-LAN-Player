@@ -93,17 +93,18 @@ public class RecvLanDataService extends Service {
 		// ScanSdCardToReflashMusicList();
 
 		/* 方法2 缺少扫描后广播通知 */
-		// String filePath = Environment.getExternalStorageDirectory().getPath()
-		// + '/' + GlobalData.Other.SAVE_LAN_FILE_DIR + "/" + fileName;
-		//
-		// scanFileAsync(filePath);
+		String filePath = Environment.getExternalStorageDirectory().getPath()
+				+ '/' + GlobalData.Other.SAVE_LAN_FILE_DIR + "/" + fileName;
+
+		Uri data = Uri.parse("file://" + filePath);
+		sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, data));
 
 		/* 方法3 */
-		MediaScannerConnection.scanFile(this, new String[] { Environment
-				.getExternalStorageDirectory().getPath()
-				+ '/'
-				+ GlobalData.Other.SAVE_LAN_FILE_DIR + "/" + fileName }, null,
-				null);
+		// MediaScannerConnection.scanFile(this, new String[] { Environment
+		// .getExternalStorageDirectory().getPath()
+		// + '/'
+		// + GlobalData.Other.SAVE_LAN_FILE_DIR + "/" + fileName }, null,
+		// null);
 
 	}
 
@@ -281,6 +282,7 @@ public class RecvLanDataService extends Service {
 
 	/**
 	 * 当文件接收成功，向android系统发送广播，通知其扫描应用音乐文件的下载目录
+	 * 不过在小米1S和红米测试，发现可能由于系统限制，无法发出该广播
 	 */
 	private void ScanSdCardToReflashMusicList() {
 
@@ -298,14 +300,5 @@ public class RecvLanDataService extends Service {
 
 	}
 
-	public void scanFileAsync(String filePath) {
-		// Intent scanIntent = new
-		// Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-		// scanIntent.setData(Uri.fromFile(new File(filePath)));
-		// sendBroadcast(scanIntent);
-
-		Uri data = Uri.parse("file://" + filePath);
-		sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, data));
-	}
 
 }

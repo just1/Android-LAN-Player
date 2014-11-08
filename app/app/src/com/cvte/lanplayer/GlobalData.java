@@ -114,4 +114,33 @@ public class GlobalData {
 		public static final String SAVE_LAN_FILE_DIR = "LanDownloads";
 	}
 
+	/**
+	 * 应用内部的通知消息
+	 * 
+	 * 
+	 * @author JHYin
+	 *
+	 */
+	public class AppInform{
+		
+		
+		/*
+		 * 收到更新音乐列表的命令
+		 */
+		public static final int COMMAND_REFLASH_MUSIC_LIST = 1;
+		
+		/*
+		 * 收到显示TOAST消息的命令
+		 */
+		public static final int COMMAND_SHOW_TOAST_MSG = 2;
+		
+
+		/*
+		 * 负责局域网接收的应用内部的通知消息的接收器
+		 */
+		public static final String RECV_APP_INFORM_ACTION = "android.intent.action.recv_app_inform_action";
+
+	}
+	
+	
 }
