@@ -65,11 +65,6 @@ public class LanTestMsgFragment extends Fragment {
 				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
 						et_ip.getText().toString());
 
-				// 加上发送头，再发送消息
-				// SendSocketMessageUtil.getInstance(mActivity).SendMessage(
-				// GlobalData.COMMAND_HEAD_SEND_MSG
-				// + et_context.getText().toString(),
-				// et_ip.getText().toString());
 			}
 		});
 
@@ -82,7 +77,7 @@ public class LanTestMsgFragment extends Fragment {
 		return view;
 	}
 
-	// 获取扫描出来的IP地址的接收器
+	// 获取发送过来的文本消息的接收器
 	private class RecvSocketReceiver extends BroadcastReceiver {
 
 		// 自定义一个广播接收器

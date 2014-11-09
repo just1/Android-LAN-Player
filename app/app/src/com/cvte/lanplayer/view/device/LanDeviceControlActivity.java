@@ -13,7 +13,9 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.cvte.lanplayer.GlobalData;
@@ -26,6 +28,7 @@ public class LanDeviceControlActivity extends FragmentActivity {
 	private String targetIp = null;
 
 	private TextView tv_target_ip;
+	private Button btn_back;
 
 	private MyFragmentPagerAdapter adapter;
 	private ViewPager vp;
@@ -60,19 +63,40 @@ public class LanDeviceControlActivity extends FragmentActivity {
 	private void InitView() {
 
 		tv_target_ip = (TextView) findViewById(R.id.tv_target_ip);
+		btn_back = (Button) findViewById(R.id.btn_back);
+		
 		tv_target_ip.setText("目标IP：" + targetIp);
+		btn_back.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				LanDeviceControlActivity.this.finish();
+			}
+		});
+		
 
 		vp = (ViewPager) findViewById(R.id.vp);
 		adapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
 
-		// 传递消息到Fragment里面
+		// 初始化LanMusicFragment
 		LanMusicFragment lanMusicFragment = new LanMusicFragment();
-		Bundle bundle = new Bundle();
-		bundle.putString(GlobalData.GetBundle.GET_IP, targetIp);
-		lanMusicFragment.setArguments(bundle);
+		Bundle musitBundle = new Bundle();
+		musitBundle.putString(GlobalData.GetBundle.GET_IP, targetIp);
+		lanMusicFragment.setArguments(musitBundle);
+		
+		// 初始化LanChatFragment
+		LanChatFragment lanChatFragment = new LanChatFragment();
+		Bundle chatBundle = new Bundle();
+		chatBundle.putString(GlobalData.GetBundle.GET_IP, targetIp);
+		lanChatFragment.setArguments(chatBundle);
 
+		
 		fragmentList.add(lanMusicFragment);
-		titleList.add("目标音乐列表");
+		fragmentList.add(lanChatFragment);
+		
+		titleList.add("Music");
+		titleList.add("Chat");
 
 		vp.setAdapter(adapter);
 
