@@ -29,7 +29,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.cvte.lanplayer.MainActivity" />
-        <activity android:name="com.cvte.lanplayer.view.LanDeviceControlActivity" />
+        <activity android:name="com.cvte.lanplayer.view.device.LanDeviceControlActivity" />
 
         <service android:name="com.cvte.lanplayer.service.PlayerService" />
         <service android:name="com.cvte.lanplayer.service.RecvLanDataService" />

@@ -1,4 +1,4 @@
-package com.cvte.lanplayer.view;
+package com.cvte.lanplayer.view.device;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,33 +23,31 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.adapter.MyListAdapter;
-import com.cvte.lanplayer.constant.AppConstant;
 import com.cvte.lanplayer.entity.SocketTranEntity;
-import com.cvte.lanplayer.utils.SendSocketFileUtil;
 import com.cvte.lanplayer.utils.SendSocketMessageUtil;
 
-public class LanTestFileFragment extends Fragment {
+public class LanMusicFragment extends Fragment {
 
-	private final String TAG = "LanMusicListTestFragment";
+	private final String TAG = "LanMusicFragment";
 
-	private Button btn_test_send;
-	private TextView tv_recv;
-	private EditText et_ip;
+	private String targetIp = null;
+
+	private TextView tv_target_ip;
+	private Button btn_send_msg;
 	private ListView lv_music_list;
 
 	private List<String> mMusicList = new ArrayList<String>();
 	private MyListAdapter mMusicListAdapter;
 
-	private Activity mActivity;
-
 	private RecvScoketMsgReceiver mRecvScoketMsgReceiver;
+
+	private Activity mActivity;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -61,24 +59,25 @@ public class LanTestFileFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
-		View view = inflater.inflate(R.layout.fragment_lan_file_test,
-				container, false);
-		btn_test_send = (Button) view.findViewById(R.id.btn_test_send);
-		tv_recv = (TextView) view.findViewById(R.id.tv_recv_data);
-		et_ip = (EditText) view.findViewById(R.id.et_ip);
-		lv_music_list = (ListView) view.findViewById(R.id.lv_music_list);
+		View view = inflater.inflate(R.layout.fragment_lan_music, container,
+				false);
 
-		Init();
-		SetListener();
+		tv_target_ip = (TextView) view.findViewById(R.id.tv_target_ip);
+		btn_send_msg = (Button) view.findViewById(R.id.btn_send_msg);
+		lv_music_list = (ListView) view.findViewById(R.id.lv_music_list);
 
 		return view;
 	}
 
-	private void Init() {
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onViewCreated(view, savedInstanceState);
 
-		// 为ListView设置Adapter
-		mMusicListAdapter = new MyListAdapter(mMusicList, mActivity);
-		lv_music_list.setAdapter(mMusicListAdapter);
+		// 通过Bundle获取Activity里面的数据
+		Bundle bundle = getArguments();
+		targetIp = bundle.getString(GlobalData.GetBundle.GET_IP);
+		tv_target_ip.setText("目标IP：" + targetIp);
 
 		// 注册接收器
 		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
@@ -86,11 +85,16 @@ public class LanTestFileFragment extends Fragment {
 		filter.addAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);
 		mActivity.registerReceiver(mRecvScoketMsgReceiver, filter);
 
+		// 设置监听
+		SetListener();
 	}
 
+	/**
+	 * 设置监听
+	 */
 	private void SetListener() {
-
-		btn_test_send.setOnClickListener(new OnClickListener() {
+		// TODO Auto-generated method stub
+		btn_send_msg.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -103,10 +107,14 @@ public class LanTestFileFragment extends Fragment {
 				msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_LIST);
 
 				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
-						et_ip.getText().toString());
+						targetIp);
 
 			}
 		});
+
+		// 为ListView设置Adapter
+		mMusicListAdapter = new MyListAdapter(mMusicList, mActivity);
+		lv_music_list.setAdapter(mMusicListAdapter);
 
 		// 设置ListView监听
 		lv_music_list.setOnItemClickListener(new OnItemClickListener() {
@@ -118,6 +126,15 @@ public class LanTestFileFragment extends Fragment {
 				ShowRequsetDialog(position);
 			}
 		});
+	}
+
+	@Override
+	public void onDestroyView() {
+		// TODO Auto-generated method stub
+		super.onDestroyView();
+
+		// 结束的时候取消注册广播接收器，否则报错
+		mActivity.unregisterReceiver(mRecvScoketMsgReceiver);
 	}
 
 	/**
@@ -152,7 +169,7 @@ public class LanTestFileFragment extends Fragment {
 				msg.setmSendIP(getIpAddress());
 
 				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
-						et_ip.getText().toString());
+						targetIp);
 
 				// 发送文件
 				// SendSocketFileUtil.getInstance().SendFile(
@@ -174,7 +191,6 @@ public class LanTestFileFragment extends Fragment {
 		});
 
 		builder.show();
-
 	}
 
 	/**
@@ -228,7 +244,6 @@ public class LanTestFileFragment extends Fragment {
 				mMusicListAdapter.notifyDataSetChanged();
 
 			}
-
 		}
 	}
 

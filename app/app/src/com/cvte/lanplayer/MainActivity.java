@@ -13,11 +13,11 @@ import android.support.v4.view.ViewPager;
 import android.view.Window;
 
 import com.cvte.lanplayer.service.RecvLanDataService;
-import com.cvte.lanplayer.view.LanTestFileFragment;
-import com.cvte.lanplayer.view.LanTestMsgFragment;
-import com.cvte.lanplayer.view.LanTestMusicListFragment;
 import com.cvte.lanplayer.view.LocalPlayerFragment;
 import com.cvte.lanplayer.view.ScanLanDeviceFragment;
+import com.cvte.lanplayer.view.test.LanTestFileFragment;
+import com.cvte.lanplayer.view.test.LanTestMsgFragment;
+import com.cvte.lanplayer.view.test.LanTestMusicListFragment;
 
 public class MainActivity extends FragmentActivity {
 	private final String TAG = "MainActivity";

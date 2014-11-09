@@ -28,6 +28,7 @@ import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.adapter.MyListAdapter;
 import com.cvte.lanplayer.utils.ScanLanDeviceUtil;
+import com.cvte.lanplayer.view.device.LanDeviceControlActivity;
 
 public class ScanLanDeviceFragment extends Fragment {
 

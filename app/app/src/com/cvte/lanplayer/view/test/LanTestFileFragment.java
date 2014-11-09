@@ -1,4 +1,4 @@
-package com.cvte.lanplayer.view;
+package com.cvte.lanplayer.view.test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,91 +14,83 @@ import android.content.IntentFilter;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
-import android.util.AttributeSet;
+import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.Window;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.cvte.lanplayer.GlobalData;
 import com.cvte.lanplayer.R;
 import com.cvte.lanplayer.adapter.MyListAdapter;
+import com.cvte.lanplayer.constant.AppConstant;
 import com.cvte.lanplayer.entity.SocketTranEntity;
+import com.cvte.lanplayer.utils.SendSocketFileUtil;
 import com.cvte.lanplayer.utils.SendSocketMessageUtil;
 
-public class LanDeviceControlActivity extends Activity {
+public class LanTestFileFragment extends Fragment {
 
-	private final String TAG = "LanDeviceControlActivity";
+	private final String TAG = "LanMusicListTestFragment";
 
-	private String targetIp = null;
-
-	private TextView tv_target_ip;
-	private Button btn_send_msg;
+	private Button btn_test_send;
+	private TextView tv_recv;
+	private EditText et_ip;
 	private ListView lv_music_list;
 
 	private List<String> mMusicList = new ArrayList<String>();
 	private MyListAdapter mMusicListAdapter;
 
+	private Activity mActivity;
+
 	private RecvScoketMsgReceiver mRecvScoketMsgReceiver;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		// 隐藏Title
-		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_landevice_ctrl);
-
-		InitData();
-		InitView();
-		SetListener();
-
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		this.mActivity = activity;
 	}
 
 	@Override
-	public View onCreateView(String name, Context context, AttributeSet attrs) {
-		// TODO Auto-generated method stub
-		return super.onCreateView(name, context, attrs);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+
+		View view = inflater.inflate(R.layout.fragment_lan_file_test,
+				container, false);
+		btn_test_send = (Button) view.findViewById(R.id.btn_test_send);
+		tv_recv = (TextView) view.findViewById(R.id.tv_recv_data);
+		et_ip = (EditText) view.findViewById(R.id.et_ip);
+		lv_music_list = (ListView) view.findViewById(R.id.lv_music_list);
+
+		Init();
+		SetListener();
+
+		return view;
 	}
 
-	/**
-	 * 实例化控件
-	 */
-	private void InitView() {
+	private void Init() {
 
-		tv_target_ip = (TextView) findViewById(R.id.tv_target_ip);
-		btn_send_msg = (Button) findViewById(R.id.btn_send_msg);
-		lv_music_list = (ListView) findViewById(R.id.lv_music_list);
-
-		tv_target_ip.setText("目标IP：" + targetIp);
-
-	}
-
-	/**
-	 * 初始化数据
-	 */
-	private void InitData() {
-		Intent intent = getIntent();
-		targetIp = (String) intent.getSerializableExtra("ip");
+		// 为ListView设置Adapter
+		mMusicListAdapter = new MyListAdapter(mMusicList, mActivity);
+		lv_music_list.setAdapter(mMusicListAdapter);
 
 		// 注册接收器
 		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(GlobalData.SocketTranCommand.RECV_SOCKET_FROM_SERVICE_ACTION);
-		registerReceiver(mRecvScoketMsgReceiver, filter);
+		mActivity.registerReceiver(mRecvScoketMsgReceiver, filter);
+
 	}
 
-	/**
-	 * 设置监听
-	 */
 	private void SetListener() {
-		// TODO Auto-generated method stub
-		btn_send_msg.setOnClickListener(new OnClickListener() {
+
+		btn_test_send.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -110,16 +102,11 @@ public class LanDeviceControlActivity extends Activity {
 				SocketTranEntity msg = new SocketTranEntity();
 				msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_LIST);
 
-				SendSocketMessageUtil
-						.getInstance(LanDeviceControlActivity.this)
-						.SendMessage(msg, targetIp);
+				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
+						et_ip.getText().toString());
 
 			}
 		});
-
-		// 为ListView设置Adapter
-		mMusicListAdapter = new MyListAdapter(mMusicList, this);
-		lv_music_list.setAdapter(mMusicListAdapter);
 
 		// 设置ListView监听
 		lv_music_list.setOnItemClickListener(new OnItemClickListener() {
@@ -133,15 +120,6 @@ public class LanDeviceControlActivity extends Activity {
 		});
 	}
 
-	@Override
-	protected void onDestroy() {
-		// TODO Auto-generated method stub
-		super.onDestroy();
-
-		// 结束的时候取消注册广播接收器，否则报错
-		unregisterReceiver(mRecvScoketMsgReceiver);
-	}
-
 	/**
 	 * 弹出是否请求拉取对话框
 	 * 
@@ -150,7 +128,7 @@ public class LanDeviceControlActivity extends Activity {
 
 		String musicName = mMusicList.get(musicID);
 
-		AlertDialog.Builder builder = new Builder(this);
+		AlertDialog.Builder builder = new Builder(mActivity);
 
 		// 设置标题
 		builder.setTitle("获取音乐");
@@ -173,9 +151,8 @@ public class LanDeviceControlActivity extends Activity {
 				msg.setmMessage(String.valueOf(musicID));
 				msg.setmSendIP(getIpAddress());
 
-				SendSocketMessageUtil
-						.getInstance(LanDeviceControlActivity.this)
-						.SendMessage(msg, targetIp);
+				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
+						et_ip.getText().toString());
 
 				// 发送文件
 				// SendSocketFileUtil.getInstance().SendFile(
@@ -207,7 +184,8 @@ public class LanDeviceControlActivity extends Activity {
 	 * 
 	 */
 	private String getIpAddress() {
-		WifiManager wifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+		WifiManager wifiManager = (WifiManager) mActivity
+				.getSystemService(mActivity.WIFI_SERVICE);
 
 		WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 
@@ -253,4 +231,5 @@ public class LanDeviceControlActivity extends Activity {
 
 		}
 	}
+
 }
