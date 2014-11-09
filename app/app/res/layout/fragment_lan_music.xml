@@ -4,14 +4,8 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/tv_target_ip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp" />
-
     <Button
-        android:id="@+id/btn_send_msg"
+        android:id="@+id/btn_request_musiclist"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="获取目标音乐列表"

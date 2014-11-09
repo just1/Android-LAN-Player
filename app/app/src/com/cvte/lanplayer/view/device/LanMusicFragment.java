@@ -38,8 +38,7 @@ public class LanMusicFragment extends Fragment {
 
 	private String targetIp = null;
 
-	private TextView tv_target_ip;
-	private Button btn_send_msg;
+	private Button btn_request_musiclist;
 	private ListView lv_music_list;
 
 	private List<String> mMusicList = new ArrayList<String>();
@@ -62,8 +61,8 @@ public class LanMusicFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_lan_music, container,
 				false);
 
-		tv_target_ip = (TextView) view.findViewById(R.id.tv_target_ip);
-		btn_send_msg = (Button) view.findViewById(R.id.btn_send_msg);
+		btn_request_musiclist = (Button) view
+				.findViewById(R.id.btn_request_musiclist);
 		lv_music_list = (ListView) view.findViewById(R.id.lv_music_list);
 
 		return view;
@@ -77,7 +76,6 @@ public class LanMusicFragment extends Fragment {
 		// 通过Bundle获取Activity里面的数据
 		Bundle bundle = getArguments();
 		targetIp = bundle.getString(GlobalData.GetBundle.GET_IP);
-		tv_target_ip.setText("目标IP：" + targetIp);
 
 		// 注册接收器
 		mRecvScoketMsgReceiver = new RecvScoketMsgReceiver();
@@ -87,6 +85,8 @@ public class LanMusicFragment extends Fragment {
 
 		// 设置监听
 		SetListener();
+		// 请求获得目标IP的音乐列表
+		GetMusicList();
 	}
 
 	/**
@@ -94,21 +94,14 @@ public class LanMusicFragment extends Fragment {
 	 */
 	private void SetListener() {
 		// TODO Auto-generated method stub
-		btn_send_msg.setOnClickListener(new OnClickListener() {
+		btn_request_musiclist.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
 
 				Log.d(TAG, "on click button");
 
-				// 发送获取音乐列表的请求
-				// 实例化传输对象
-				SocketTranEntity msg = new SocketTranEntity();
-				msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_LIST);
-
-				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
-						targetIp);
-
+				GetMusicList();
 			}
 		});
 
@@ -126,15 +119,6 @@ public class LanMusicFragment extends Fragment {
 				ShowRequsetDialog(position);
 			}
 		});
-	}
-
-	@Override
-	public void onDestroyView() {
-		// TODO Auto-generated method stub
-		super.onDestroyView();
-
-		// 结束的时候取消注册广播接收器，否则报错
-		mActivity.unregisterReceiver(mRecvScoketMsgReceiver);
 	}
 
 	/**
@@ -171,13 +155,6 @@ public class LanMusicFragment extends Fragment {
 				SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg,
 						targetIp);
 
-				// 发送文件
-				// SendSocketFileUtil.getInstance().SendFile(
-				// AppConstant.MusicPlayData.myMusicList.get(musicID)
-				// .getFileName(),
-				// AppConstant.MusicPlayData.myMusicList.get(musicID)
-				// .getFilePath(), et_ip.getText().toString());
-
 			}
 		});
 
@@ -211,6 +188,18 @@ public class LanMusicFragment extends Fragment {
 		return ((ipAddress & 0xff) + "." + (ipAddress >> 8 & 0xff) + "."
 				+ (ipAddress >> 16 & 0xff) + "." + (ipAddress >> 24 & 0xff));
 
+	}
+
+	/**
+	 * 请求目标IP，获取其音乐列表
+	 */
+	private void GetMusicList() {
+		// 发送获取音乐列表的请求
+		// 实例化传输对象
+		SocketTranEntity msg = new SocketTranEntity();
+		msg.setmCommant(GlobalData.SocketTranCommand.COMMAND_REQUSET_MUSIC_LIST);
+
+		SendSocketMessageUtil.getInstance(mActivity).SendMessage(msg, targetIp);
 	}
 
 	// 获取扫描出来的IP地址的接收器
@@ -247,4 +236,12 @@ public class LanMusicFragment extends Fragment {
 		}
 	}
 
+	@Override
+	public void onDestroyView() {
+		// TODO Auto-generated method stub
+		super.onDestroyView();
+
+		// 结束的时候取消注册广播接收器，否则报错
+		mActivity.unregisterReceiver(mRecvScoketMsgReceiver);
+	}
 }

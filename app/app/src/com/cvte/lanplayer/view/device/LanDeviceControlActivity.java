@@ -65,13 +65,12 @@ public class LanDeviceControlActivity extends FragmentActivity {
 		vp = (ViewPager) findViewById(R.id.vp);
 		adapter = new MyFragmentPagerAdapter(getSupportFragmentManager());
 
-		//传递消息到Fragment里面
+		// 传递消息到Fragment里面
 		LanMusicFragment lanMusicFragment = new LanMusicFragment();
 		Bundle bundle = new Bundle();
 		bundle.putString(GlobalData.GetBundle.GET_IP, targetIp);
 		lanMusicFragment.setArguments(bundle);
-		
-		
+
 		fragmentList.add(lanMusicFragment);
 		titleList.add("目标音乐列表");
 

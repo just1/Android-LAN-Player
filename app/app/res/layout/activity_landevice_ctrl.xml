@@ -4,12 +4,28 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/tv_target_ip"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="18sp" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="5dp"
+        android:orientation="horizontal" >
 
+        <Button
+            android:id="@+id/btn_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:text="返回"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_target_ip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textSize="18sp" />
+    </RelativeLayout>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vp"
@@ -23,18 +39,5 @@
             android:layout_gravity="top"
             android:background="@color/white_bg" />
     </android.support.v4.view.ViewPager>
-
-<!--     <Button
-        android:id="@+id/btn_send_msg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="获取目标音乐列表"
-        android:textSize="18sp" />
-
-    <ListView
-        android:id="@+id/lv_music_list"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp" /> -->
 
 </LinearLayout>
