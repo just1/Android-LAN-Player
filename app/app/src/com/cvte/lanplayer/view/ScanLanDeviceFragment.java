@@ -144,7 +144,7 @@ public class ScanLanDeviceFragment extends Fragment {
 				Intent startIntent = new Intent(mActivity,
 						LanDeviceControlActivity.class);
 
-				startIntent.putExtra("ip", mIpList.get(position));
+				startIntent.putExtra(GlobalData.GetBundle.GET_IP, mIpList.get(position));
 				startActivity(startIntent);
 
 			}

@@ -107,7 +107,7 @@ public class LanDeviceControlActivity extends FragmentActivity {
 	 */
 	private void InitData() {
 		Intent intent = getIntent();
-		targetIp = (String) intent.getSerializableExtra("ip");
+		targetIp = (String) intent.getSerializableExtra(GlobalData.GetBundle.GET_IP);
 
 	}
 

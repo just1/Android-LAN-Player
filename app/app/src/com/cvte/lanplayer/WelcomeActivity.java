@@ -3,6 +3,10 @@ package com.cvte.lanplayer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.cvte.lanplayer.utils.CheckSDCardUtil;
+import com.cvte.lanplayer.utils.CheckWIFIConnectUtil;
+import com.cvte.lanplayer.utils.ShowToastMsgUtil;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +15,9 @@ import android.view.Window;
 
 public class WelcomeActivity extends Activity {
 
+	private boolean mIsHaveWIFI = false;
+	private boolean mIsHaveSDCard = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -18,6 +25,9 @@ public class WelcomeActivity extends Activity {
 		// 隐藏Title
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_welcome);
+
+		mIsHaveWIFI = CheckWIFIConnectUtil.isWifiConnected(this);
+		mIsHaveSDCard = CheckSDCardUtil.IsHaveSDcard();
 
 		Timer mTimer = new Timer();
 		// 任务
@@ -30,8 +40,21 @@ public class WelcomeActivity extends Activity {
 				WelcomeActivity.this.finish();
 			}
 		};
-		// 计时2m之后跳转到主页面
-		mTimer.schedule(mTask, 2000);
+
+		// 如果已接入WIFI和存在SD卡，则跳转页面
+		if (mIsHaveWIFI == true) {
+			if (mIsHaveSDCard == true) {
+				// 计时2m之后跳转到主页面
+				mTimer.schedule(mTask, 2000);
+			} else {
+				//使用Toast显示SD卡未插入
+		        ShowToastMsgUtil.getInstance(this).ShowToastMsg("SD卡未插入,请退出应用");
+			}
+		} else {
+			//使用Toast显示WIFI未连接
+	        ShowToastMsgUtil.getInstance(this).ShowToastMsg("WIFI未连接,请退出应用");
+		}
+
 	}
 
 	@Override
